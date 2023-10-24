@@ -17,3 +17,15 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.Rproj.user
+
+# Build objects
+__pycache__
+dist
+*.egg-info
+
+# R stuff
+.Rhistory
+.Rprofile
+
+examples

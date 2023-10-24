@@ -1,0 +1,5 @@
+build
+click
+PyYAML>=6.0
+setuptools
+wheel

@@ -49,7 +49,7 @@ class Repository:
     def _dockerignore(self):
         dockerignore = (
             "Dockerfile\n.dockerignore\n.dockerenv\n.Rhistory\n.Rprofile\n"
-            + ".Rproj.user\n.git\n"
+            + ".Rproj.user\n.git\nrenv\n"
         )
         self.dockerignore = dockerignore
         return self
@@ -181,15 +181,13 @@ class Repository:
     def _pydeps(self):
         py_deps = (
             "RUN pip install pipreqs pipreqsnb && \\"
-            + "\n    pipreqs --savepath requirements-scripts.txt ./ || "
-            + "touch requirements-scripts.txt && \\"
-            + "\n    pipreqsnb --savepath requirements-nbs.txt ./ || "
-            + "touch requirements-nbs.txt && \\"
-            + "\n    [ -f requirements.txt ] && "
-            + "pip install -r requirements.txt || true && \\"
-            + "\n    pip install -r requirements-scripts.txt && \\"
-            + "\n    pip install -r requirements-nbs.txt && \\"
-            + "\n    rm requirements-scripts.txt requirements-nbs.txt\n"
+            + "\n    pipreqs --savepath requirements-scripts.txt ./ || true && \\"
+            + "\n    pipreqsnb --savepath requirements-nbs.txt ./ || true && \\"
+            + "\n    [ -f requirements.txt ] && pip install -r requirements.txt || true && \\"
+            + "\n    [ -f requirements-scripts.txt ] && pip install -r requirements-scripts.txt || true && \\"
+            + "\n    [ -f requirements-nbs.txt ] && pip install -r requirements-nbs.txt || true && \\"
+            + "\n    [ -f requirements-scripts.txt ] && rm -f requirements-scripts.txt || true && \\"
+            + "\n    [ -f requirements-nbs.txt ] && rm -f requirements-nbs.txt || true\n"
         )
         self.pydeps = py_deps
         return self
@@ -274,10 +272,11 @@ class Repository:
     def _rdeps(self):
         r_deps = (
             "RUN source /etc/os-release && \\"
-            + "\n    R -e \"if(file.exists('./renv.lock')) { renv::restore(repos='https://packagemanager.posit.co/cran/__linux__/${UBUNTU_CODENAME}/latest', prompt = FALSE, type = 'binary') }\" && \\"
-            + "\n    R -e \"renv::install(c('yaml', 'reticulate'), repos='https://packagemanager.posit.co/cran/__linux__/${UBUNTU_CODENAME}/latest', prompt = FALSE, type = 'binary')\" && \\"
-            + "\n    R -e \"r_deps <- renv::dependencies(); renv::install(r_deps[['Package']], repos='https://packagemanager.posit.co/cran/__linux__/${UBUNTU_CODENAME}/latest', prompt = FALSE, type = 'binary')\""
-            + "\nENV RETICULATE_PYTHON=/opt/.venv/bin/python"
+            + "\n    R -e \"if(file.exists('./renv.lock')) { lockfile <- renv::lockfile_read('./renv.lock'); exclude_pkgs <- c('base', 'boot', 'class', 'cluster', 'codetools', 'compiler', 'datasets', 'docopt', 'foreign', 'graphics', 'grDevices', 'grid', 'KernSmooth', 'lattice', 'littler', 'MASS', 'Matrix', 'methods', 'mgcv', 'nlme', 'nnet', 'parallel', 'rpart', 'spatial', 'splines', 'stats', 'stats4', 'survival', 'tcltk', 'tools', 'utils', 'renv'); updated_lockfile_pkgs <- lockfile[['Packages']][!names(lockfile[['Packages']]) %in% exclude_pkgs]; lockfile[['Packages']] <- updated_lockfile_pkgs; print(sort(names(lockfile[['Packages']]))); renv::lockfile_write(lockfile, './renv.lock') }\" && \\"
+            + "\n    R -e \"if(file.exists('./renv.lock')) { renv::restore(lockfile = './renv.lock', prompt = FALSE) }\" && \\"
+            + "\n    R -e \"renv::install(c('yaml', 'reticulate'), prompt = FALSE, type = 'binary')\" && \\"
+            + "\n    R -e \"install <- function(package) { if (isFALSE(require(package, quietly = TRUE, character.only = TRUE))) { tryCatch({ renv::install(package, prompt = FALSE, type = 'binary') }, error = function(err) cat('Failed to install', package, '\\n')) } }; r_deps <- renv::dependencies(); lapply(r_deps[['Package']], install)\""
+            + "\nENV RETICULATE_PYTHON=\"/opt/.venv/bin/python\"\n"
         )
         self.rdeps = r_deps
         return self

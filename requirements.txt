@@ -1,5 +1,6 @@
 build
 click
 PyYAML>=6.0
+prompt-toolkit
 setuptools
 wheel

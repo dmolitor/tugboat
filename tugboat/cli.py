@@ -1,9 +1,9 @@
-from build import ImageBuilder
 import click
-from config import TugboatConfig
-from construct import DockerfileGenerator
-from run import ResourceManager
-from utils import check_docker
+from tugboat.build import ImageBuilder
+from tugboat.config import TugboatConfig
+from tugboat.construct import DockerfileGenerator
+from tugboat.run import ResourceManager
+from tugboat.utils import check_docker
 
 def execute(dryrun):
     docker_installed = check_docker()
@@ -23,6 +23,8 @@ def execute(dryrun):
 @click.option("--dryrun", is_flag=True, default=False, help="Test a Tugboat command without actually running anything.")
 @click.pass_context
 def cli(ctx, dryrun):
+    if ctx.obj == None:
+        ctx.obj = {}
     ctx.obj["DRYRUN"] = dryrun
 
 @cli.command(help="Build a Docker image from the working directory.")
@@ -35,6 +37,8 @@ def build(ctx, dryrun):
         repo = execute(ctx.obj["DRYRUN"])
         if not repo:
             return False
+    except:
+        repo = None
     finally:
         if repo:
             repo._rstudio_kill()
@@ -50,6 +54,8 @@ def run(ctx, dryrun):
         repo = execute(ctx.obj["DRYRUN"])
         if not repo:
             return False
+    except:
+        repo = None
     finally:
         if repo:
             repo._rstudio_kill()
@@ -67,4 +73,4 @@ def info(ctx):
     )
 
 if __name__ == "__main__":
-    cli(obj={})
+    cli()

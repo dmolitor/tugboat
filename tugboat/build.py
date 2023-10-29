@@ -1,13 +1,13 @@
-from config import TugboatConfig
-from construct import DockerfileGenerator
+#from config import TugboatConfig
+#from construct import DockerfileGenerator
 from datetime import datetime
 import getpass
 import json
 import prompt_toolkit as pt
 import os
 import subprocess
-from utils import hash_text, image_info, run, string_to_none
-from validators import yes_no_validator
+from tugboat.utils import hash_text, image_info, run, string_to_none
+from tugboat.validators import yes_no_validator
 
 class ImageBuilder:
     """Build a Docker image from a local directory.
@@ -32,7 +32,7 @@ class ImageBuilder:
     Methods
     -------
     """
-    def __init__(self, generator: DockerfileGenerator):
+    def __init__(self, generator):
         self._built = False
         self._dryrun = False
         self._image_name = None
@@ -182,10 +182,9 @@ class ImageBuilder:
         # Build the image
         if not dryrun:
             _ = run(
-                ["docker", "build", "-t", (repo_str + ":" + image_tag), "."],
+                ["docker", "build", "-t", (self._repository + ":" + self._image_tag), "."],
                 stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                **kwargs
+                stderr=subprocess.STDOUT
             )
         self.built = True
         self._lockfile()

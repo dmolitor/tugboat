@@ -1,8 +1,9 @@
-from build import ImageBuilder
-from config import TugboatConfig
-from construct import DockerfileGenerator
+# from build import ImageBuilder
+# from config import TugboatConfig
+# from construct import DockerfileGenerator
 import prompt_toolkit as pt
-from validators import number_validator
+import subprocess
+from tugboat.validators import number_validator
 import webbrowser
 
 class ResourceManager:
@@ -27,7 +28,7 @@ class ResourceManager:
         Allows the user to pick their method of choice to interact with the
         Docker image.
     """
-    def __init__(self, image_builder: ImageBuilder):
+    def __init__(self, image_builder):
         self._active_jupyter_session = False
         self._active_rstudio_session = False
         self._image_builder = image_builder

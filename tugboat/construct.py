@@ -1,4 +1,4 @@
-from config import TugboatConfig
+# from config import TugboatConfig
 import json
 import os
 import prompt_toolkit as pt
@@ -6,7 +6,7 @@ import re
 import subprocess
 import time
 import urllib.request
-from utils import hash_text
+from tugboat.utils import hash_text
 import webbrowser
 import yaml
 
@@ -33,7 +33,7 @@ class DockerfileGenerator:
     Methods
     -------
     """
-    def __init__(self, config: TugboatConfig):
+    def __init__(self, config):
         self.config = config.config
         self.requirements = config.requirements
         self._dockerfile = ""
@@ -453,7 +453,7 @@ class DockerfileGenerator:
             print(f"✅ Dockerfile has been saved at {os.path.abspath('Dockerfile')}")
             print(f"✅ .dockerignore has been saved at {os.path.abspath('.dockerignore')}")
         else:
-            print("ℹ️ Dockerfile hasn't changed. Using the existing version!")
+            print("ℹ️  Dockerfile hasn't changed. Using the existing version!")
             self._using_existing_dockerfile = True
         return self
 

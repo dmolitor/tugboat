@@ -2,8 +2,8 @@ import json
 import os
 import prompt_toolkit as pt
 import re
-from utils import string_to_none
-from validators import (
+from tugboat.utils import string_to_none
+from tugboat.validators import (
     add_remove_edit_validator,
     yes_no_validator,
     software_validator,
@@ -99,7 +99,7 @@ class TugboatConfig:
             match_middle=True
         )
         are = pt.prompt(
-            "ℹ️ Would you like to add, remove, or edit the version of a software?\n(Add/Remove/Edit): ",
+            "ℹ️  Would you like to add, remove, or edit the version of a software?\n(Add/Remove/Edit): ",
             completer=are_completer,
             validator=add_remove_edit_validator,
             validate_while_typing=True

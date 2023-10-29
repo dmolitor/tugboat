@@ -1,21 +1,21 @@
-from src.config import TugboatConfig
+from config import TugboatConfig
 import json
 import os
 import prompt_toolkit as pt
 import re
 import subprocess
 import time
+import urllib.request
+from utils import hash_text
 import webbrowser
 import yaml
 
-class ImageBuilder:
-    """Build and push a Docker image from a local directory.
+class DockerfileGenerator:
+    """Create a Dockerfile from a local directory.
     
-    ImageBuilder will ingest a configuration file from a local directory and,
-    in turn, will spit out a corresponding Docker file containing all files
-    in the directory as well as any required software. This class will also
-    attempt to smoothly handle the building and deployment of this image to
-    DockerHub
+    DockerfileGenerator will ingest a configuration file from a local directory
+    and, in turn, will spit out a corresponding Docker file containing all files
+    in the directory as well as any required software.
     
     Parameters
     ----------
@@ -27,16 +27,20 @@ class ImageBuilder:
     ----------
     config : dict
         Configuration settings structured as a dictionary.
-    requires : list of str
+    requirements : list of str
         A list of all software requirements.
     
     Methods
     -------
     """
     def __init__(self, config: TugboatConfig):
-        
+        self.config = config.config
+        self.requirements = config.requirements
+        self._dockerfile = ""
+        self._dockerignore = ""
+        self._using_existing_dockerfile = False
     
-    def _dockerignore(self, *args):
+    def _dockerignore_create(self, *args):
         dockerignore = (
             "Dockerfile\n.dockerignore\n.dockerenv\n.Rhistory\n.Rprofile\n"
             + ".Rproj.user\n.git\nrenv\n"
@@ -44,11 +48,13 @@ class ImageBuilder:
         return dockerignore
     
     def _dockerfile_julia(self):
-        julia_version = self._software_version("julia", "latest")
+        julia_version = self._software_version("Julia", "latest")
         julia_install = (
             f"ENV JULIA_VERSION={julia_version}"
-            + "\nRUN rocker_scripts/install_julia.sh\n"
+            + "\nRUN rocker_scripts/install_julia.sh\n\n"
         )
+        if not "Julia" in self.requirements:
+            julia_install = ""
         return julia_install
     
     def _dockerfile_jupyter(self):
@@ -63,30 +69,34 @@ class ImageBuilder:
             + "\n    R -e 'IRkernel::installspec(user = FALSE)' && \\"
             + "\n    echo -e \"#!/bin/bash\\n\\"
             + "\n# Start Jupyter Lab and redirect its output to the console\\n\\"
-            + "\nnohup jupyter lab --ip=0.0.0.0 --port=8888 --allow-root --notebook-dir=/gangway_dir --no-browser > /jupyter.log 2>&1 &\\n\\"
+            + "\nnohup jupyter lab --ip=0.0.0.0 --port=8888 --allow-root --notebook-dir=/tugboat_dir --no-browser > /jupyter.log 2>&1 &\\n\\"
             + "\n# Use 'tail' to keep the script running\\n\\"
             + "\ntail -f /jupyter.log\" >> /init_jupyter && \\"
             + "\n    chmod +x /init_jupyter"
-            + "\n\nEXPOSE 8888\n"
+            + "\n\nEXPOSE 8888\n\n"
         )
+        if not "Jupyter" in self.requirements:
+            jupyter_install = ""
         return jupyter_install
     
     def _dockerfile_pandoc(self):
-        pandoc_version = self._software_version("pandoc", "default")
+        pandoc_version = self._software_version("Pandoc", "default")
         pandoc_install = (
             f"ENV PANDOC_VERSION=\"{pandoc_version}\""
-            + "\nRUN rocker_scripts/install_pandoc.sh\n"
+            + "\nRUN rocker_scripts/install_pandoc.sh\n\n"
         )
+        if not "Pandoc" in self.requirements:
+            pandoc_install = ""
         return pandoc_install
     
     def _dockerfile_prelude(self):
-        r_version = self._software_version("r", "latest")
+        r_version = self._software_version("R", "latest")
         prelude = (
             f"FROM rocker/r-ver:{r_version}"
             + "\n\n"
             + "SHELL [\"/bin/bash\", \"-c\"]"
             + "\n\n"
-            + "COPY ./ ./gangway_dir"
+            + "COPY ./ ./tugboat_dir"
             + "\n\n"
             + "RUN source /etc/os-release && \\"
             + "\n    R -e \"install.packages('renv')\"\n\n"
@@ -94,7 +104,7 @@ class ImageBuilder:
         return prelude
     
     def _dockerfile_python(self):
-        python_version = self._software_version("python")
+        python_version = self._software_version("Python")
         if not python_version == None:
             python_install = f"ENV PYTHON_VERSION={python_version}\n"
             mamba_install = "\n    mamba install -y python=${PYTHON_VERSION} && \\"
@@ -120,15 +130,18 @@ class ImageBuilder:
             + "\nENV PATH=${VENV}/bin:${PATH}"
             + "\nRUN echo \"PATH=${PATH}\" >> /usr/local/lib/R/etc/Renviron.site && \\"
             + "\n    echo \"export PATH=${PATH}\" >> /etc/profile"
-            + "\nENV RETICULATE_PYTHON=\"${VENV}/bin/python\"\n"
+            + "\nENV RETICULATE_PYTHON=\"${VENV}/bin/python\" && \\"
+            + "\nR -e \"renv::install('reticulate', prompt = FALSE, type = 'binary')\"\n\n"
         )
+        if not "Python" in self.requirements:
+            python_install = ""
         return python_install
     
     def _dockerfile_postlude(self):
         postlude = (
             "RUN chmod -R a+rwX /opt && \\"
             + "\n    chmod -R a+rwX /srv && \\"
-            + "\n    chmod -R a+rwX /gangway_dir"
+            + "\n    chmod -R a+rwX /tugboat_dir"
             + "\n\nCMD [\"/bin/bash\"]"
         )
         return postlude
@@ -142,20 +155,46 @@ class ImageBuilder:
             + "\n    [ -f requirements-scripts.txt ] && pip install -r requirements-scripts.txt || true && \\"
             + "\n    [ -f requirements-nbs.txt ] && pip install -r requirements-nbs.txt || true && \\"
             + "\n    [ -f requirements-scripts.txt ] && rm -f requirements-scripts.txt || true && \\"
-            + "\n    [ -f requirements-nbs.txt ] && rm -f requirements-nbs.txt || true\n"
+            + "\n    [ -f requirements-nbs.txt ] && rm -f requirements-nbs.txt || true\n\n"
         )
+        if not "Python" in self.requirements:
+            py_deps = ""
         return py_deps
     
     def _dockerfile_quarto(self):
-        quarto_version = self._software_version("quarto", "default")
+        quarto_version = self._software_version("Quarto", "default")
         quarto_install = (
             f"ENV QUARTO_VERSION=\"{quarto_version}\""
             + "\nRUN rocker_scripts/install_quarto.sh\n\n"
         )
+        if not "Quarto" in self.requirements:
+            quarto_install = ""
         return quarto_install
     
+    def _dockerfile_remove(self, silent=True):
+        dockerfile_path = "Dockerfile"
+        dockerignore_path = ".dockerignore"
+        if os.path.isfile(dockerfile_path):
+            os.remove(dockerfile_path)
+            return True
+        elif silent:
+            return True
+        else:
+            raise Exception(f"No Dockerfile exists at the following location: {os.path.realpath(dockerfile_path)}")
+        if os.path.isfile(dockerignore_path):
+            os.remove(dockerignore_path)
+            return True
+        elif silent:
+            return True
+        else:
+            raise Exception(f"No .dockerignore file exists at the following location: {os.path.realpath(dockerignore_path)}")
+        return None
+    
     def _dockerfile_rstudio(self):
-        rs_version = self._software_version("rstudio", "latest")
+        with urllib.request.urlopen("https://www.rstudio.com/wp-content/downloads.json") as url:
+            j = json.load(url)
+            v = j.get("rstudio").get("open_source").get("stable").get("version")
+        rs_version = self._software_version("RStudio", v)
         rs_install = (
             f"ENV RSTUDIO_VERSION=\"{rs_version}\""
             "\nRUN source /etc/os-release && \\"
@@ -211,10 +250,12 @@ class ImageBuilder:
             + "\n    cp /rocker_scripts/init_userconf.sh /etc/cont-init.d/02_userconf && \\"
             + "\n    cp /rocker_scripts/pam-helper.sh /usr/lib/rstudio-server/bin/pam-helper && \\"
             + "\n    rm -rf /var/lib/apt/lists/* && \\"
-            + "\n    echo -e \"# /etc/rstudio/rsession.conf\\nsession-default-working-dir=/gangway_dir\" >> /etc/rstudio/rsession.conf && \\"
+            + "\n    echo -e \"# /etc/rstudio/rsession.conf\\nsession-default-working-dir=/tugboat_dir\" >> /etc/rstudio/rsession.conf && \\"
             + "\n    echo -e \"\\nInstall RStudio Server, done!\""
-            + "\n\nEXPOSE 8787\n"
+            + "\n\nEXPOSE 8787\n\n"
         )
+        if not "RStudio" in self.requirements:
+            rs_install = ""
         return rs_install
     
     def _dockerfile_rdeps(self):
@@ -222,9 +263,11 @@ class ImageBuilder:
             "RUN source /etc/os-release && \\"
             + "\n    R -e \"if(file.exists('./renv.lock')) { lockfile <- renv::lockfile_read('./renv.lock'); exclude_pkgs <- c('base', 'boot', 'class', 'cluster', 'codetools', 'compiler', 'datasets', 'docopt', 'foreign', 'graphics', 'grDevices', 'grid', 'KernSmooth', 'lattice', 'littler', 'MASS', 'Matrix', 'methods', 'mgcv', 'nlme', 'nnet', 'parallel', 'rpart', 'spatial', 'splines', 'stats', 'stats4', 'survival', 'tcltk', 'tools', 'utils', 'renv'); updated_lockfile_pkgs <- lockfile[['Packages']][!names(lockfile[['Packages']]) %in% exclude_pkgs]; lockfile[['Packages']] <- updated_lockfile_pkgs; print(sort(names(lockfile[['Packages']]))); renv::lockfile_write(lockfile, './renv.lock') }\" && \\"
             + "\n    R -e \"if(file.exists('./renv.lock')) { renv::restore(lockfile = './renv.lock', prompt = FALSE) }\" && \\"
-            + "\n    R -e \"renv::install(c('yaml', 'reticulate'), prompt = FALSE, type = 'binary')\" && \\"
-            + "\n    R -e \"install <- function(package) { if (isFALSE(require(package, quietly = TRUE, character.only = TRUE))) { tryCatch({ renv::install(package, prompt = FALSE, type = 'binary') }, error = function(err) cat('Failed to install', package, '\\n')) } }; r_deps <- renv::dependencies(); lapply(r_deps[['Package']], install)\"\n"
+            + "\n    R -e \"renv::install(c('yaml'), prompt = FALSE, type = 'binary')\" && \\"
+            + "\n    R -e \"install <- function(package) { if (isFALSE(require(package, quietly = TRUE, character.only = TRUE))) { tryCatch({ renv::install(package, prompt = FALSE, type = 'binary') }, error = function(err) cat('Failed to install', package, '\\n')) } }; r_deps <- renv::dependencies(); lapply(r_deps[['Package']], install)\"\n\n"
         )
+        if not "R" in self.requirements:
+            r_deps = ""
         return r_deps
     
     def _dockerfile_system_dependencies(self):
@@ -308,9 +351,31 @@ class ImageBuilder:
             + "\n    software-properties-common \\"
             + "\n    vim \\"
             + "\n    libpng-dev && \\"
-            + "\n    apt-get update\n"
+            + "\n    apt-get update\n\n"
         )
-        self.system_dependencies = sys_deps
+        return sys_deps
+    
+    def _dockerfile_workdir(self):
+        workdir = "WORKDIR ./tugboat_dir\n\n"
+        return workdir
+    
+    def _dockerfile_write(self):
+        with open("Dockerfile", "w+") as d:
+            d.write(self._dockerfile)
+        with open(".dockerignore", "w+") as d:
+            d.write(self._dockerignore)
+        return self
+    
+    def _insert_software_in_config(self, software: str, version=None):
+        if software.lower() in [s.lower() for s in self.requirements]:
+            return self
+        self.config[software] = {"version": version}
+        return self
+    
+    def _insert_software_in_requirements(self, software: str):
+        if software.lower() in [s.lower() for s in self.requirements]:
+            return self
+        self.requirements.append(software)
         return self
     
     def _lockfile(self):
@@ -334,43 +399,22 @@ class ImageBuilder:
             j.write(lockfile_pretty)
         return self
     
-    def _requires(self, software: str):
-        is_required = software.lower() in self.requires
-        return is_required
-    
-    def __repr__(self):
-        status_str = (
-            "Repository Status " + ("=" * 62)
-            + "\n\nDocker Image:"
-            + "\n[x] Dockerfile Directory: "
-            + os.path.abspath(self.dockerfile_dir)
-            + "\n[x] Dockerfile Built: "
-            + str(self.built)
-        )
-        status_str = status_str + "\n\nActive Containers:"
-        if not self.active_rstudio_session and not self.active_jupyter_session:
-            status_str = status_str + " None"
-        if self.active_rstudio_session:
-            status_str = (
-                status_str + "\n[x] RStudio Container" + f"\n    Name: "
-                + self.rstudio_container + "\n    URL: " + self.rstudio_url
-            )
-        if self.active_jupyter_session:
-            status_str = (
-                status_str + "\n[x] Jupyter Container" + f"\n    Name: "
-                + self.jupyter_container + "\n    URL: " + self.jupyter_url 
-                + "/lab?token=" + self.jupyter_token
-            )
-        status_str = (
-            status_str
-            + "\n\nConfig:\n"
-            + json.dumps(self.config, indent=4)
-        )
-        return status_str
+    def _software_check(self, software: list):
+        if "RStudio" in software:
+            self._insert_software_in_config("Quarto")
+            self._insert_software_in_requirements("Quarto")
+            self._insert_software_in_config("Pandoc")
+            self._insert_software_in_requirements("Pandoc")
+        if "Jupyter" in software:
+            self._insert_software_in_config("Python")
+            self._insert_software_in_requirements("Python")
+        if "Quarto" in software:
+            self._insert_software_in_config("Pandoc")
+            self._insert_software_in_requirements("Pandoc")
+        return self
     
     def _software_version(self, software: str, default=None):
-        software = software.lower()
-        if not software in self.requires:
+        if not software in self.requirements:
             return default
         software = self.config[software]
         if not software:
@@ -381,209 +425,42 @@ class ImageBuilder:
                 version = default
         return version
     
-    def _workdir(self):
-        self.workdir = "WORKDIR ./gangway_dir\n"
-        return self
-    
-    # Public Methods ------------------------------------
-    
-    def build(self, dh_username, dh_pwd, image_name="spatial", image_tag="latest", **kwargs):
-        self.image_name = image_name
-        self.dh_username = dh_username
-        self.image_tag = image_tag
-        if not dh_username == None:
-            repo_str = dh_username + "/" + image_name
-        else:
-            repo_str = image_name
-        self.repository = repo_str
-        _ = run(
-            ["docker", "build", "-t", (repo_str + ":" + image_tag), self.dockerfile_dir],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            **kwargs
-        )
-        self.built = True
-        self.image_name = image_name
-        self.dockerhub_push(dh_username, dh_pwd)
-        return self
-    
-    def create_dockerfile(self):
-        (
-            self
-            ._prelude()
-            ._system_dependencies()
-            ._rstudio()
-            ._pandoc()
-            ._quarto()
-            ._dockerfile_julia()
-            ._jupyter()
-            ._workdir()
-            ._rdeps()
-            ._pydeps()
-            ._postlude()
-        )
+    def dockerfile_create(self):
+        print(f"Creating Dockerfile from {os.path.abspath('.')}")
+        self._software_check(self.requirements)
         dockerfile = (
-            self.prelude + "\n"
-            + self.system_dependencies + "\n"
-            + self.rstudio + "\n"
-            + self.pandoc + "\n"
-            + none_to_string(self.quarto)
-            + self.jupyter + "\n"
-            + none_to_string(self.julia)
-            + self.workdir + "\n"
-            + self.rdeps + "\n"
-            + self.pydeps + "\n"
-            + self.postlude
+            self._dockerfile_prelude()
+            + self._dockerfile_system_dependencies()
+            + self._dockerfile_rstudio()
+            + self._dockerfile_pandoc()
+            + self._dockerfile_quarto()
+            + self._dockerfile_julia()
+            + self._dockerfile_jupyter()
+            + self._dockerfile_workdir()
+            + self._dockerfile_rdeps()
+            + self._dockerfile_pydeps()
+            + self._dockerfile_postlude()
         )
-        self.dockerfile = dockerfile
-        self._dockerignore()
-        return self
-    
-    def from_lockfile(self):
-        if not os.path.isfile(os.path.join(self.dockerfile_dir, "gangway.lock")):
-            raise Exception("File gangway.lock doesnt exist in the current directory")
-        with open(os.path.join(self.dockerfile_dir, "gangway.lock"), "r") as g:
-            lockfile = json.load(g)
-        self.built = True
-        self.repository = lockfile["Repository"]
-        self.dh_username = lockfile["DHUsername"]
-        self.image_name = lockfile["ImageName"]
-        self.image_tag = lockfile["ImageTag"]
-        return self
-    
-    def dockerhub_push(self, username, pwd):
-        login = subprocess.run(["echo", pwd, "|", "docker", "login", "-u", username, "--password-stdin"], capture_output=True)
-        login.check_returncode()
-        docker_inspect = subprocess.run(["docker", "inspect", (self.repository + ":" + self.image_tag)], capture_output=True)
-        docker_inspect.check_returncode()
-        [docker_inspect] = json.loads(docker_inspect.stdout)
-        image_id = username + "/" + self.image_name + ":" + self.image_tag
-        if self.dh_username == None:
-            self.dh_username = username
-            docker_tag = subprocess.run(
-                [
-                    "docker", "tag", (self.repository + ":" + self.image_tag), 
-                    image_id
-                ],
-                capture_output=True
-            )
-            docker_tag.check_returncode()
-        docker_push = run(["docker", "push", image_id])
-        self._lockfile()
-        return self
-    
-    def jupyter_kill(self, force=True):
-        if not self.active_jupyter_session:
-            return True
-        if force:
-            cmd_args = ["docker", "remove", "-f", self.jupyter_container]
+        self._dockerfile = dockerfile
+        self._dockerignore = self._dockerignore_create()
+        if os.path.isfile("Dockerfile"):
+            with open("Dockerfile", "r") as d:
+                existing_df = d.read()
         else:
-            cmd_args = ["docker", "remove", self.jupyter_container]
-        container = subprocess.run(cmd_args, capture_output=True)
-        container.check_returncode()
-        self.jupyter_container = None
-        self.active_jupyter_session = False
-        return True
-    
-    def jupyter_launch(self):
-        if self.active_jupyter_session:
-            tab_status = webbrowser.open_new_tab(
-                self.jupyter_url + "lab?token=" + self.jupyter_token
-            )
-            return tab_status
-        jupyter_container = "docker_jupyter"
-        container = subprocess.run(
-            [
-                "docker", "run", "-d", "--name", f"{jupyter_container}",
-                "-p", "8888:8888", "-e", f"JUPYTER_TOKEN={self.jupyter_token}",
-                (self.repository + ":" + self.image_tag), "/init_jupyter"
-            ],
-            capture_output=True
-        )
-        container.check_returncode()
-        self.active_jupyter_session = True
-        self.jupyter_container = jupyter_container
-        time.sleep(2)
-        tab_status = webbrowser.open_new_tab(
-            self.jupyter_url + "lab?token=" + self.jupyter_token
-        )
-        return tab_status
-    
-    def remove_dockerfile(self, silent=True):
-        dockerfile_path = os.path.join(self.dockerfile_dir, "Dockerfile")
-        dockerignore_path = os.path.join(self.dockerfile_dir, ".dockerignore")
-        if os.path.isfile(dockerfile_path):
-            os.remove(dockerfile_path)
-            return True
-        elif silent:
-            return True
+            existing_df = "No Dockerfile exists"
+        if not hash_text(self._dockerfile) == hash_text(existing_df):
+            self._dockerfile_write()
+            print(f"✅ Dockerfile has been saved at {os.path.abspath('Dockerfile')}")
+            print(f"✅ .dockerignore has been saved at {os.path.abspath('.dockerignore')}")
         else:
-            raise Exception(f"No Dockerfile exists at the following location: {os.path.realpath(dockerfile_path)}")
-        if os.path.isfile(dockerignore_path):
-            os.remove(dockerignore_path)
-            return True
-        elif silent:
-            return True
-        else:
-            raise Exception(f"No .dockerignore file exists at the following location: {os.path.realpath(dockerignore_path)}")
-        return None
-    
-    def rstudio_kill(self, force=True):
-        if not self.active_rstudio_session:
-            return True
-        if force:
-            cmd_args = ["docker", "remove", "-f", self.rstudio_container]
-        else:
-            cmd_args = ["docker", "remove", self.rstudio_container]
-        container = subprocess.run(cmd_args, capture_output=True)
-        container.check_returncode()
-        self.rstudio_container = None
-        self.active_rstudio_session = False
-        return True
-    
-    def rstudio_launch(self):
-        if self.active_rstudio_session:
-            tab_status = webbrowser.open_new_tab(self.rstudio_url)
-            return tab_status
-        rstudio_container = "docker_rstudio"
-        container = subprocess.run(
-            [
-                "docker", "run", "-d", "--name", f"{rstudio_container}",
-                "-p", "8787:8787", "-e", "ROOT=true", "-e",
-                "DISABLE_AUTH=true", (self.repository + ":" + self.image_tag), "/init"
-            ],
-            capture_output=True
-        )
-        container.check_returncode()
-        self.active_rstudio_session = True
-        self.rstudio_container = rstudio_container
-        time.sleep(2)
-        tab_status = webbrowser.open_new_tab(self.rstudio_url)
-        return tab_status
-    
-    def write_dockerfile(self):
-        if self.dockerfile == None:
-            raise Exception("No Dockerfile has been created yet. To do this, call `self.create_dockerfile()`")
-        with open(os.path.join(self.dockerfile_dir, "Dockerfile"), "w+") as d:
-            d.write(self.dockerfile)
-        with open(os.path.join(self.dockerfile_dir, ".dockerignore"), "w+") as d:
-            d.write(self.dockerignore)
+            print("ℹ️ Dockerfile hasn't changed. Using the existing version!")
+            self._using_existing_dockerfile = True
         return self
 
 # if __name__ == "__main__":
-#     tst = TugboatConfig()
-#     tst.generate_config()
-#     print(f"Config: {tst.config}\nRequirements: {tst.requirements}")
-#     repo = Repository("gangway.yml")
-#     repo.from_lockfile()
-#     
-#     # Launch and kill RStudio and Jupyter
-#     repo.rstudio_launch()
-#     repo.jupyter_launch()
-#     
-#     # Kill active sessions
-#     if repo.active_jupyter_session:
-#         repo.jupyter_kill()
-#     if repo.active_rstudio_session:
-#         repo.rstudio_kill()
-
+#     test_config = TugboatConfig()
+#     test_config.generate_config()
+#     test_dockerfile = DockerfileGenerator(config=test_config)
+#     test_dockerfile.dockerfile_create()
+#     print(f"Using existing Dockerfile? {test_dockerfile._using_existing_dockerfile}")
+#     print(test_dockerfile._dockerfile)

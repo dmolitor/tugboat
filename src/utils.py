@@ -1,5 +1,20 @@
+import hashlib
 import re
+import shutil
 import subprocess
+
+def check_docker():
+    exists = shutil.which("docker")
+    if not exists:
+        print("❌ Docker is not installed. Visit https://docs.docker.com/get-docker/ to get started!")
+        return False
+    else:
+        print("✅ Docker is installed. We should be good to go!")
+        return True
+
+def hash_text(text: str):
+    hash_object = hashlib.sha256(text.encode("utf-8"))
+    return hash_object.hexdigest()
 
 def image_info(digests=True):
     """Information on all local Docker images

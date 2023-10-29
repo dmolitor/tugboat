@@ -69,8 +69,8 @@ class TugboatConfig:
         if not edit:
             pt.print_formatted_text(
                 pt.HTML(
-                    "For each software, please enter the version you'd like to use"
-                    + ".\n<u>(If you're unsure or it doesn't matter, keep this empty"
+                    "ℹ️  For each software, please enter the version you'd like to use"
+                    + ".\n   <u>(If you're unsure or it doesn't matter, keep this empty"
                     + " and hit Enter/Return)</u>"
                 )
             )
@@ -99,14 +99,14 @@ class TugboatConfig:
             match_middle=True
         )
         are = pt.prompt(
-            "Would you like to add, remove, or edit the version of a software?\n(Add/Remove/Edit): ",
+            "ℹ️ Would you like to add, remove, or edit the version of a software?\n(Add/Remove/Edit): ",
             completer=are_completer,
             validator=add_remove_edit_validator,
             validate_while_typing=True
         )
         if are.lower() == "remove":
             sw_to_remove = pt.prompt(
-               "What software would you like to remove: ",
+               "   What software would you like to remove: ",
                 completer=sw_completer,
                 validator=software_validator,
                 validate_while_typing=True,
@@ -117,7 +117,7 @@ class TugboatConfig:
                 self.requirements.remove(sw_to_remove)
         elif are.lower() == "edit":
             sw_to_edit = pt.prompt(
-               "What software would you like to edit the version for: ",
+               "   What software would you like to edit the version for: ",
                 completer=sw_completer,
                 validator=software_validator,
                 validate_while_typing=True,
@@ -134,7 +134,7 @@ class TugboatConfig:
             for k,v in config.items():
                 self.config[k] = v
         yn = pt.prompt(
-            "Would you like to make further edits? [Y/n]: ",
+            "   Would you like to make further edits? [Y/n]: ",
             validator=yes_no_validator,
             validate_while_typing=True
         )
@@ -145,7 +145,7 @@ class TugboatConfig:
     def _write_config(self):
         with open("tugboat.yml", "w+") as config_fp:
             yaml.dump(self.config, config_fp, default_flow_style=False)
-        print("Configuration file written to ./tugboat.yml")
+        print("✅ Configuration file written to ./tugboat.yml")
         return None
     
     def generate_config(self, path: str = "./tugboat.yml"):
@@ -181,12 +181,12 @@ class TugboatConfig:
                 self._write_config()
         else:
             yn = pt.prompt(
-                "No Tugboat configuration file was found.\nWould you like to create one? [Y/n]: ",
+                "❌ No Tugboat configuration file was found.\n   Would you like to create one? [Y/n]: ",
                 validator=yes_no_validator,
                 validate_while_typing=True
             )
             if yn.lower() in ["n", "no"]:
-                print("Please create a configuration file and put it at ./tugboat.yml")
+                print("   Please create a configuration file and put it at ./tugboat.yml")
                 return self
             requires = self._input_software()
             config = self._input_software_version(requires)
@@ -194,8 +194,8 @@ class TugboatConfig:
             self.requirements = requires
             pt.print_formatted_text(
                 pt.HTML(
-                    "Would you like to save your configuration file?\n<u>(This is "
-                    + "highly recommended otherwise all changes will be lost)</u>"
+                    "Would you like to save your configuration file?\n❗<u>(This is "
+                    + "highly recommended otherwise all changes will be lost)❗</u>"
                 )
             )
             write_config = pt.prompt(

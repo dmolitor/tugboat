@@ -1,37 +1,70 @@
+from build import ImageBuilder
 import click
-from gangway import ui
+from config import TugboatConfig
+from construct import DockerfileGenerator
+from run import ResourceManager
+from utils import check_docker
 
-@click.command()
-@click.option("--build", is_flag=True, help="Build Docker image from local directory.")
-@click.option("--run", is_flag=True, help="Interactively work with Docker image")
-def execute(build, run):
-    if run:
-        build = True
-    if build or run:
-        docker_installed = ui.check_docker()
-        if docker_installed == -1:
+def execute(dryrun):
+    docker_installed = check_docker()
+    if not docker_installed:
+        return False
+    config = TugboatConfig()
+    config.generate_config()
+    dockerfile = DockerfileGenerator(config=config)
+    dockerfile.dockerfile_create()
+    imgbuilder = ImageBuilder(generator=dockerfile)
+    imgbuilder.image_build(dryrun=dryrun)
+    rmanager = ResourceManager(image_builder=imgbuilder)
+    rmanager.run()
+    return rmanager
+
+@click.group()
+@click.option("--dryrun", is_flag=True, default=False, help="Test a Tugboat command without actually running anything.")
+@click.pass_context
+def cli(ctx, dryrun):
+    ctx.obj["DRYRUN"] = dryrun
+
+@cli.command(help="Build a Docker image from the working directory.")
+@click.option("--dryrun", is_flag=True, default=False)
+@click.pass_context
+def build(ctx, dryrun):
+    try:
+        if dryrun:
+            ctx.obj["DRYRUN"] = True
+        repo = execute(ctx.obj["DRYRUN"])
+        if not repo:
             return False
-        repo = ui.load_config()
-        if repo == -1:
+    finally:
+        if repo:
+            repo._rstudio_kill()
+            repo._jupyter_kill()
+
+@cli.command(help="Run an existing Tugboat Docker image.")
+@click.option("--dryrun", is_flag=True, default=False)
+@click.pass_context
+def run(ctx, dryrun):
+    try:
+        if dryrun:
+            ctx.obj["DRYRUN"] = True
+        repo = execute(ctx.obj["DRYRUN"])
+        if not repo:
             return False
-        try:
-            repo = ui.find_local_build(repo)
-            repo = ui.orchestrate_build(repo)
-            if repo == -1:
-                return False
-            repo = ui.launch_container(repo)
-            if repo == -1:
-                return False
-        finally:
-            repo.rstudio_kill()
-            repo.jupyter_kill()
-    else:
-        print(
-            "[x] Execute `gangway --build` to build a Docker image from the local directory."
-            + "\n[x] Execute `gangway --run` to run a pre-existing Docker image in the local directory."
-            + "\n[x] Execute `gangway --help` for more details."
-        )
-        return True
+    finally:
+        if repo:
+            repo._rstudio_kill()
+            repo._jupyter_kill()
+
+@cli.command(help="Print a user-friendly guide to Tugboat.")
+@click.pass_context
+def info(ctx):
+    print(
+        "ℹ️  Execute `tugboat build` to build a Docker image from a local directory."
+        + "\nℹ️  Execute `tugboat run` to run an existing image created from a directory."
+        + "\nℹ️  Add the `--dryrun` argument to test either `build`"
+        + " or `run` without actually running anything."
+        + "\nℹ️  Execute `tugboat --help` for more details."
+    )
 
 if __name__ == "__main__":
-    execute()
+    cli(obj={})

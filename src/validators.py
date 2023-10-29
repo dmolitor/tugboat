@@ -38,6 +38,16 @@ software_validator = pt.validation.Validator.from_callable(
     move_cursor_to_end=True
 )
 
+# Create a validator class for numeric options
+def valid_number(text):
+    return text.isdigit()
+
+number_validator = pt.validation.Validator.from_callable(
+    valid_number,
+    error_message="Invalid option selected",
+    move_cursor_to_end=True
+)
+
 # Create a validator class for our software version selection
 def valid_version(text):
     pattern = r"^[0-9\.\+\-]*$"

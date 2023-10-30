@@ -3,46 +3,38 @@
 A tool for quickly generating a Docker image from a directory and allowing
 the user to interact with that Docker image.
 
-## Building
+## Installation
 
-First, install all dependencies:
-```
-pip install -r requirements.txt
-```
-
-Next, build the package
-```
-python -m build
-```
-
-Then, you should be able to pip install locally using the buil .whl file:
-```
-pip install dist/tugboat-0.0.2-py3-none-any.whl
+As tugboat is still very early on in it's development, it can be installed from
+TestPyPi with the following:
+```python
+python3 -m pip install --index-url https://test.pypi.org/simple/ tugboat
 ```
 
 ## Usage
 
-Now, the gangway cli should be available to use:
+Now, the tugboat cli should be available to use. To get a quick overview, use
+the `info` command:
 ```
-gangway
-#| [x] Execute `tugboat --build` to build a Docker image from the local directory.
-#| [x] Execute `tugboat --run` to run a pre-existing Docker image in the local directory.
-#| [x] Execute `tugboat --help` for more details.
+tugboat info
+#| ℹ️  Execute `tugboat build` to build a Docker image from a local directory.
+#| ℹ️  Execute `tugboat run` to run an existing image created from a directory.
+#| ℹ️  Add the `--dryrun` argument to test either `build` or `run` without actually running anything.
+#| ℹ️  Execute `tugboat --help` for more details.
 ```
 
-## Build a Docker image
+### Turn your directory into a Docker image
 
-You need a .yaml file basically specifying if you need R and Python. Can be as
-simple as:
-```yaml
-R:
-  version: 4.3.1
-Python:
-  version: 3.11
+The goal is for this to be as simple for the user as possible. Simply run
 ```
-Save this as `tugboat.yml` in the root directory.
+tugboat build
+```
+and it will walk you through all the steps.
 
-Then simply run tugboat and it will walk you through all the steps.
+If you want to get a feel for the user experience without actually building
+anything (which can be quite time consuming), run
 ```
-tugboat --build
+tugboat build --dryrun
 ```
+This will walk you through the entire process without creating anything, so you
+can get a feel for the process.

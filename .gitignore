@@ -29,6 +29,7 @@ dist
 .Rhistory
 .Rprofile
 
-examples
 tugboat.yml
 tugboat.lock
+Dockerfile
+.dockerignore

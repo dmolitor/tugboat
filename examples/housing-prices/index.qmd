@@ -1,0 +1,283 @@
+---
+title: "Housing Prices Analysis"
+format:
+  html:
+    code-fold: false
+    code-tools:
+      source: https://github.com/dmolitor/housing-prices/blob/main/index.qmd
+    self-contained: true
+    theme: journal
+    toc: true
+    toc-depth: 3
+highlight-style: dracula
+jupyter: python3
+---
+
+The goal of this short project is to document a fairly realistic ML pipeline,
+including data cleaning, data visualization, and model development.
+
+# Python
+
+## Requisite modules
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy
+from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import cross_val_score, GridSearchCV, StratifiedShuffleSplit
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.tree import DecisionTreeRegressor
+```
+
+## Import data
+```{python}
+housing = pd.read_csv(
+  "https://raw.githubusercontent.com/ageron/handson-ml2/master/datasets/housing/housing.csv"
+)
+```
+
+We can quickly summarize the housing data.
+```{python}
+housing.describe()
+```
+
+Now that we have a quick overview of the data, we can plot a histogram of all
+numeric values.
+```{python}
+#| layout: [[100]]
+housing.hist(bins = 50, figsize = (12, 8));
+plt.show()
+```
+
+We're going to bin the `median_income` variable to allow for stratified sampling
+within income bins.
+```{python}
+#| layout: [[100]]
+housing["median_income_bin"] = pd.cut(
+  housing["median_income"],
+  bins = [0, 1.5, 3, 4.5, 6, np.inf],
+  labels = [1, 2, 3, 4, 5]
+)
+# Plot histogram of counts
+housing["median_income_bin"].hist();
+plt.show()
+```
+
+## Visualize data
+Now, let's visualize the median house prices by plotting them geographically.
+```{python}
+#| layout: [[100]]
+(
+  housing.
+  rename(columns = {"median_house_value": "Median House Value"}).
+  plot(
+    kind = "scatter",
+    x = "longitude",
+    y = "latitude",
+    alpha = 0.1,
+    s = housing["population"]/100,
+    c = "Median House Value",
+    colormap = plt.get_cmap("jet"),
+    colorbar = True,
+    title = "Median House Prices by Population",
+    xlabel = "Longitude",
+    ylabel = "Latitude"
+  )
+)
+plt.show()
+```
+
+Let's also look at the correlation between a few of our numeric variables.
+```{python}
+#| layout: [[100]]
+pd.plotting.scatter_matrix(
+  housing[
+    [
+     "median_house_value",
+     "median_income",
+     "total_rooms",
+     "housing_median_age"
+    ]
+  ],
+  alpha = 0.1,
+  figsize = (10, 8)
+);
+plt.show()
+```
+
+Let's specifically take a look at the relationship between `median_income` and
+`median_house_value`.
+```{python}
+#| layout: [[100]]
+(
+  housing.
+  rename(
+    columns = {
+      "median_income": "Median Income",
+      "median_house_value": "Median House Value"
+    }
+  ).
+  plot(
+    kind = "scatter",
+    x = "Median Income",
+    y = "Median House Value",
+    alpha = 0.1
+  )
+)
+plt.show()
+```
+
+## Feature engineering
+We want to create a couple new features: `rooms_per_household` and
+`bedrooms_per_room`.
+```{python}
+housing["rooms_per_household"] = housing["total_rooms"]/housing["households"]
+housing["bedrooms_per_room"] = housing["total_bedrooms"]/housing["total_rooms"]
+housing["pop_per_household"] = housing["population"]/housing["households"]
+```
+
+## Modeling prep
+Let's do an 70-30 split of the data initially.
+```{python}
+split = StratifiedShuffleSplit(
+  n_splits = 1,
+  test_size = 0.3,
+  random_state = 123
+)
+for train_idx, test_idx in split.split(housing, housing["median_income_bin"]):
+  train = housing.loc[train_idx].drop(
+    ["median_income_bin", "median_house_value"],
+    axis = 1
+  )
+  train_labels = housing.loc[train_idx, "median_house_value"]
+  test = housing.loc[test_idx].drop(
+    ["median_income_bin", "median_house_value"],
+    axis = 1
+  )
+  test_labels = housing.loc[test_idx, "median_house_value"]
+```
+
+Now, let's prep the data for modeling.
+```{python}
+# Numeric transformations
+num_transform = Pipeline(
+  [
+    ("imputer", SimpleImputer(strategy = "median")),
+    ("scaler", StandardScaler())
+  ]
+)
+full_transform = ColumnTransformer(
+  [
+    (
+     "numeric",
+     num_transform,
+     list(train.drop("ocean_proximity", axis = 1).columns)
+    ),
+    ("categorical", OneHotEncoder(), ["ocean_proximity"])
+  ]
+)
+train = full_transform.fit_transform(train)
+test = full_transform.transform(test)
+```
+
+## Train models
+Let's quick chalk up a function to print CV metrics.
+```{python}
+def metrics_summary(scores):
+  print("Mean: ", scores.mean().round(2))
+  print("Standard Dev.: ", scores.std().round(2))
+```
+
+### Linear Regression
+The first model is a simple linear regression model.
+```{python}
+# Fit model
+lin_reg_scores = np.sqrt(
+  -cross_val_score(
+     LinearRegression(),
+     train,
+     train_labels,
+     scoring = "neg_mean_squared_error",
+     cv = 10
+   )
+)
+# Summarize score info
+metrics_summary(lin_reg_scores)
+```
+
+### Decision Tree
+
+The next model is a single decision tree model.
+```{python}
+# Fit model
+tree_reg = np.sqrt(
+  -cross_val_score(
+     DecisionTreeRegressor(),
+     train,
+     train_labels,
+     scoring = "neg_mean_squared_error",
+     cv = 10
+   )
+)
+# Summarize score info
+metrics_summary(tree_reg)
+```
+
+### Random Forest
+
+Now, we will run a random forest model.
+```{python}
+# Fit model
+forest_reg = np.sqrt(
+  -cross_val_score(
+     RandomForestRegressor(n_estimators = 30),
+     train,
+     train_labels,
+     scoring = "neg_mean_squared_error",
+     cv = 10
+   )
+)
+# Summarize score info
+metrics_summary(forest_reg)
+```
+
+And finally, we will tune our random forest model via grid search.
+```{python}
+# Fit model
+forest_reg_grid = GridSearchCV(
+  RandomForestRegressor(),
+  param_grid = {
+    "n_estimators": [30],
+    "min_samples_leaf": [5],
+    "max_features": ["sqrt"]
+  },
+  scoring = "neg_mean_squared_error",
+  cv = 5,
+  return_train_score = True
+)
+forest_reg_grid_fit = forest_reg_grid.fit(train, train_labels)
+# Get CV results
+cv_results = forest_reg_grid_fit.cv_results_
+# Summarize score info
+for mean_sc, param in zip(cv_results["mean_test_score"], cv_results["params"]):
+  print("Mean: ", np.sqrt(-mean_sc).round(2))
+  print("Parameters: ", param)
+```
+
+## Final predictions
+```{python}
+# Extract model
+final_model = forest_reg_grid_fit.best_estimator_
+# Make predictions
+final_preds = final_model.predict(test)
+# Final RMSE
+print(
+  "Test RMSE: ", np.sqrt(mean_squared_error(test_labels, final_preds)).round(2)
+)
+```

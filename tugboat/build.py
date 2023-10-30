@@ -157,6 +157,15 @@ class ImageBuilder:
         if self._built:
             built = self._prep_local_image(self._repository, self._image_tag)
             if built:
+                # Allow the user to push the image when it already exists
+                print("Would you like to upload this Docker image to DockerHub?")
+                upload = pt.prompt(
+                    "[Y/n]: ",
+                    validator=yes_no_validator,
+                    validate_while_typing=True
+                )
+                if upload.lower() in ["y", "yes"]:
+                    self.image_push()
                 return self
             self._built = False
             print(
@@ -181,10 +190,9 @@ class ImageBuilder:
         
         # Build the image
         if not dryrun:
-            _ = run(
+            subprocess.run(
                 ["docker", "build", "-t", (self._repository + ":" + self._image_tag), "."],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT
+                check=True
             )
         self.built = True
         self._lockfile()
@@ -209,7 +217,7 @@ class ImageBuilder:
     def image_push(self):
         # Get user credentials
         pt.print_formatted_text(pt.HTML(
-           "ℹ️ To upload this image, you will need to provide your Docker Hub"
+           "ℹ️  To upload this image, you will need to provide your Docker Hub"
            + " username and password.\n   If you don't have an account, please"
            + " create one here: <u>https://hub.docker.com/signup</u>"
         ))
@@ -225,7 +233,7 @@ class ImageBuilder:
         if self._dh_username == None and not self._dryrun:
             docker_tag = subprocess.run(
                 [
-                    "docker", "tag", (self.repository + ":" + self.image_tag),
+                    "docker", "tag", (self._repository + ":" + self._image_tag),
                     image_id
                 ],
                 capture_output=True
@@ -234,7 +242,7 @@ class ImageBuilder:
         
         # Now push the Docker image
         if not self._dryrun:
-            docker_push = run(["docker", "push", image_id])
+            subprocess.run(["docker", "push", image_id], check=True)
         
         # Update attributes
         repo_str = username + "/" + self._image_name

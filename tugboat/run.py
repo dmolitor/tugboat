@@ -1,8 +1,9 @@
-# from build import ImageBuilder
-# from config import TugboatConfig
-# from construct import DockerfileGenerator
+from tugboat.build import ImageBuilder
+from tugboat.config import TugboatConfig
+from tugboat.construct import DockerfileGenerator
 import prompt_toolkit as pt
 import subprocess
+import time
 from tugboat.validators import number_validator
 import webbrowser
 
@@ -62,7 +63,7 @@ class ResourceManager:
             [
                 "docker", "run", "-d", "--name", f"{jupyter_container}",
                 "-p", "8888:8888", "-e", f"JUPYTER_TOKEN={self._jupyter_token}",
-                (self._image_builder.repository + ":" + self._image_builder.image_tag),
+                (self._image_builder._repository + ":" + self._image_builder._image_tag),
                 "/init_jupyter"
             ],
             capture_output=True
@@ -99,7 +100,7 @@ class ResourceManager:
                 "docker", "run", "-d", "--name", f"{rstudio_container}",
                 "-p", "8787:8787", "-e", "ROOT=true", "-e",
                 "DISABLE_AUTH=true",
-                (self._image_builder.repository + ":" + self._image_builder.image_tag),
+                (self._image_builder._repository + ":" + self._image_builder._image_tag),
                 "/init"
             ],
             capture_output=True
@@ -111,9 +112,14 @@ class ResourceManager:
         tab_status = webbrowser.open_new_tab(self._rstudio_url)
         return tab_status
     
+    def _software_in_container(self, software: str):
+        is_in = software in self._image_builder._generator.requirements
+        return is_in
+    
     def run(self):
         dryrun = self._image_builder._dryrun
-        while True:
+        check = True
+        while check:
             print("How you would like to interact with the analysis:")
             print("1. RStudio")
             print("2. Jupyter")
@@ -124,11 +130,26 @@ class ResourceManager:
                 validate_while_typing=True
             )
             if choice == "1" and not dryrun:
-                self._rstudio_launch()
+                rstudio_in_container = self._software_in_container("RStudio")
+                if rstudio_in_container:
+                    self._rstudio_launch()
+                else:
+                    print(
+                        "🫢 Oops it looks like RStudio isn't installed. "
+                        + "You may need to edit your config file!"
+                    )
             elif choice == "2" and not dryrun:
-                self._jupyter_launch()
+                jupyter_in_container = self._software_in_container("Jupyter")
+                if jupyter_in_container:
+                    self._jupyter_launch()
+                else:
+                    print(
+                        "🫢 Oops it looks like Jupyter isn't installed. "
+                        + "You may need to edit your config file!"
+                    )
             elif choice == "3":
-                return self
+                check = False
+        return self
 
 # if __name__ == "__main__":
 #     test_config = TugboatConfig()

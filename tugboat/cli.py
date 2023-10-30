@@ -16,7 +16,11 @@ def execute(dryrun):
     imgbuilder = ImageBuilder(generator=dockerfile)
     imgbuilder.image_build(dryrun=dryrun)
     rmanager = ResourceManager(image_builder=imgbuilder)
-    rmanager.run()
+    try:
+        rmanager.run()
+    finally:
+        rmanager._jupyter_kill()
+        rmanager._rstudio_kill()
     return rmanager
 
 @click.group()
@@ -31,35 +35,17 @@ def cli(ctx, dryrun):
 @click.option("--dryrun", is_flag=True, default=False)
 @click.pass_context
 def build(ctx, dryrun):
-    try:
-        if dryrun:
-            ctx.obj["DRYRUN"] = True
-        repo = execute(ctx.obj["DRYRUN"])
-        if not repo:
-            return False
-    except:
-        repo = None
-    finally:
-        if repo:
-            repo._rstudio_kill()
-            repo._jupyter_kill()
+    if dryrun:
+        ctx.obj["DRYRUN"] = True
+    repo = execute(ctx.obj["DRYRUN"])
 
 @cli.command(help="Run an existing Tugboat Docker image.")
 @click.option("--dryrun", is_flag=True, default=False)
 @click.pass_context
 def run(ctx, dryrun):
-    try:
-        if dryrun:
-            ctx.obj["DRYRUN"] = True
-        repo = execute(ctx.obj["DRYRUN"])
-        if not repo:
-            return False
-    except:
-        repo = None
-    finally:
-        if repo:
-            repo._rstudio_kill()
-            repo._jupyter_kill()
+    if dryrun:
+        ctx.obj["DRYRUN"] = True
+    repo = execute(ctx.obj["DRYRUN"])
 
 @cli.command(help="Print a user-friendly guide to Tugboat.")
 @click.pass_context

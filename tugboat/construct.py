@@ -130,8 +130,7 @@ class DockerfileGenerator:
             + "\nENV PATH=${VENV}/bin:${PATH}"
             + "\nRUN echo \"PATH=${PATH}\" >> /usr/local/lib/R/etc/Renviron.site && \\"
             + "\n    echo \"export PATH=${PATH}\" >> /etc/profile"
-            + "\nENV RETICULATE_PYTHON=\"${VENV}/bin/python\" && \\"
-            + "\nR -e \"renv::install('reticulate', prompt = FALSE, type = 'binary')\"\n\n"
+            + "\nENV RETICULATE_PYTHON=\"${VENV}/bin/python\"\n\n"
         )
         if not "Python" in self.requirements:
             python_install = ""
@@ -252,8 +251,14 @@ class DockerfileGenerator:
             + "\n    rm -rf /var/lib/apt/lists/* && \\"
             + "\n    echo -e \"# /etc/rstudio/rsession.conf\\nsession-default-working-dir=/tugboat_dir\" >> /etc/rstudio/rsession.conf && \\"
             + "\n    echo -e \"\\nInstall RStudio Server, done!\""
-            + "\n\nEXPOSE 8787\n\n"
         )
+        if "Python" in self.requirements:
+            rs_install = (
+                rs_install
+                + " && \\"
+                + "\n    R -e \"renv::install('reticulate', prompt = FALSE, type = 'binary')\""
+            )
+        rs_install = rs_install + "\n\nEXPOSE 8787\n\n"
         if not "RStudio" in self.requirements:
             rs_install = ""
         return rs_install
@@ -431,6 +436,7 @@ class DockerfileGenerator:
         dockerfile = (
             self._dockerfile_prelude()
             + self._dockerfile_system_dependencies()
+            + self._dockerfile_python()
             + self._dockerfile_rstudio()
             + self._dockerfile_pandoc()
             + self._dockerfile_quarto()

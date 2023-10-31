@@ -5,10 +5,9 @@ the user to interact with that Docker image.
 
 ## Installation
 
-As tugboat is still very early on in it's development, it can be installed from
-TestPyPi with the following:
+Install tugboat with
 ```python
-python3 -m pip install --index-url https://test.pypi.org/simple/ tugboat==0.0.5
+pip install tugboat-cli==0.0.6
 ```
 
 ## Usage

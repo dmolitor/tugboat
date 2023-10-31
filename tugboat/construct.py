@@ -3,6 +3,7 @@ import json
 import os
 import prompt_toolkit as pt
 import re
+import ssl
 import subprocess
 import time
 import urllib.request
@@ -190,7 +191,10 @@ class DockerfileGenerator:
         return None
     
     def _dockerfile_rstudio(self):
-        with urllib.request.urlopen("https://www.rstudio.com/wp-content/downloads.json") as url:
+        # Resolve issue with certificates
+        context = ssl._create_unverified_context()
+        rs_url = "https://www.rstudio.com/wp-content/downloads.json"
+        with urllib.request.urlopen(rs_url, context=context) as url:
             j = json.load(url)
             v = j.get("rstudio").get("open_source").get("stable").get("version")
         rs_version = self._software_version("RStudio", v)

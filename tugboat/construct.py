@@ -7,7 +7,7 @@ import ssl
 import subprocess
 import time
 import urllib.request
-from tugboat.utils import hash_text
+from tugboat.utils import hash_text, major_version
 import webbrowser
 import yaml
 
@@ -107,8 +107,14 @@ class DockerfileGenerator:
     def _dockerfile_python(self):
         python_version = self._software_version("Python")
         if not python_version == None:
-            python_install = f"ENV PYTHON_VERSION={python_version}\n"
-            mamba_install = "\n    mamba install -y python=${PYTHON_VERSION} && \\"
+            python_install = (
+                f"ENV PYTHON_VERSION={python_version}\n"
+                + f"ENV PYTHON_MAJOR_VERSION={major_version(python_version)}\n"
+            )
+            mamba_install = (
+                "\n    mamba install -y python=${PYTHON_VERSION} || \\"
+                + "\n    mamba install -y python=${PYTHON_MAJOR_VERSION} && \\"
+            )
         else:
             python_install = ""
             mamba_install = "\n    mamba install -y python && \\"

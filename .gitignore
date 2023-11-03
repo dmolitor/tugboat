@@ -21,6 +21,7 @@ venv.bak/
 renv/
 
 # Build objects
+build
 __pycache__
 dist
 *.egg-info

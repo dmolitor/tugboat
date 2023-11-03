@@ -49,6 +49,11 @@ def keys_to_lower(d: dict):
     d = {key.lower(): d[key] for key in d.keys()}
     return d
 
+def major_version(version: str):
+    version_split = version.split(".")
+    major_ver = f"{version_split[0]}.{version_split[1]}"
+    return major_ver
+
 def none_to_string(s):
     if s == None:
         return ""

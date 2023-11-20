@@ -46,7 +46,8 @@ class TugboatConfig:
     def _input_software(self, software=None):
         if software == None:
             sw = [
-                "Julia", "Jupyter", "Pandoc", "Python", "Quarto", "RStudio", "R"
+                "Julia", "Jupyter", "Pandoc", "Python", "Quarto", "RStudio",
+                "R", "Stata"
                 #, "RMarkdown", "Shiny", "Cuda", "Stata"
             ]
         sw_completer = pt.completion.WordCompleter(

@@ -33,6 +33,7 @@ class ImageBuilder:
     -------
     """
     def __init__(self, generator):
+        self._amd64 = "Stata" in generator.requirements
         self._built = False
         self._dryrun = False
         self._image_name = None
@@ -190,10 +191,14 @@ class ImageBuilder:
         
         # Build the image
         if not dryrun:
-            subprocess.run(
-                ["docker", "build", "-t", (self._repository + ":" + self._image_tag), "."],
-                check=True
-            )
+            run_args = ["docker", "build"]
+            if self._amd64:
+                run_args.append("--platform")
+                run_args.append("linux/amd64")
+            run_args.append("-t")
+            run_args.append((self._repository + ":" + self._image_tag))
+            run_args.append(".")
+            subprocess.run(run_args, check=True)
         self.built = True
         self._lockfile()
         
@@ -242,7 +247,12 @@ class ImageBuilder:
         
         # Now push the Docker image
         if not self._dryrun:
-            subprocess.run(["docker", "push", image_id], check=True)
+            run_args = ["docker", "push"]
+            if self._amd64:
+                run_args.append("--platform")
+                run_args.append("linux/amd64")
+            run_args.append(image_id)
+            subprocess.run(run_args, check=True)
         
         # Update attributes
         repo_str = username + "/" + self._image_name

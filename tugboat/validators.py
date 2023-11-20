@@ -26,8 +26,9 @@ yes_no_validator = pt.validation.Validator.from_callable(
 # Create a validator class for our software selection
 def in_software(text):
     sw = [
-        "Julia", "Jupyter", "Pandoc", "Python", "Quarto", "RStudio", "R"
-        #, "RMarkdown", "Shiny", "Cuda", "Stata"
+        "Julia", "Jupyter", "Pandoc", "Python", "Quarto", "RStudio", "R",
+        "Stata"
+        #, "RMarkdown", "Shiny", "Cuda"
     ]
     in_sw = [t in sw for t in text.split()]
     return all(in_sw)

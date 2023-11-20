@@ -1,10 +1,15 @@
 from tugboat.build import ImageBuilder
 from tugboat.config import TugboatConfig
 from tugboat.construct import DockerfileGenerator
+import os
 import prompt_toolkit as pt
+import shutil
 import subprocess
+import tempfile
 import time
-from tugboat.validators import number_validator
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
+from tugboat.validators import number_validator, yes_no_validator
 import webbrowser
 
 class ResourceManager:
@@ -38,6 +43,35 @@ class ResourceManager:
         self._jupyter_token = "tugboat"
         self._rstudio_container = None
         self._rstudio_url = "http://localhost:8787/"
+        self._stata_lic = None
+    
+    def _get_stata_license(self):
+        if self._stata_lic:
+            return self._stata_lic
+        Tk().withdraw()
+        file_name = askopenfilename()
+        print(f"File picked is: {file_name}")
+        file_ext = file_name.split(".").pop()
+        print(f"Is file extension okay: {file_ext}")
+        if file_ext != "lic":
+            yn = pt.prompt(
+                (
+                    "Typically a Stata license file ends with a .lic extension"
+                    + f"\nThe file you provided is {filename}"
+                    + "\nAre you sure this is the correct Stata license file?"
+                    + " [Y/n] :"
+                ),
+                validator=yes_no_validator,
+                validate_while_typing=True
+            )
+            if yn.lower() in ["n", "no"]:
+                self._browse_stata_license()
+        temp_dir = tempfile.gettempdir()
+        temp_file = os.path.join(temp_dir, "stata.lic")
+        print(f"Temp file name is: {temp_file}")
+        file_name = shutil.copy2(file_name, temp_file)
+        self._stata_lic = file_name
+        return self._stata_lic
     
     def _jupyter_kill(self, force=True):
         if not self._active_jupyter_session:
@@ -59,15 +93,16 @@ class ResourceManager:
             )
             return tab_status
         jupyter_container = "docker_jupyter"
-        container = subprocess.run(
-            [
-                "docker", "run", "-d", "--name", f"{jupyter_container}",
-                "-p", "8888:8888", "-e", f"JUPYTER_TOKEN={self._jupyter_token}",
-                (self._image_builder._repository + ":" + self._image_builder._image_tag),
-                "/init_jupyter"
-            ],
-            capture_output=True
-        )
+        args = self._launcher_args()
+        addtl_args = [
+            "-d", "--name", f"{jupyter_container}",
+            "-p", "8888:8888", "-e", f"JUPYTER_TOKEN={self._jupyter_token}",
+            (self._image_builder._repository + ":" + self._image_builder._image_tag),
+            "/init_jupyter"
+        ]
+        for a in addtl_args:
+            args.append(a)
+        container = subprocess.run(args, capture_output=True)
         container.check_returncode()
         self._active_jupyter_session = True
         self._jupyter_container = jupyter_container
@@ -76,7 +111,20 @@ class ResourceManager:
             self._jupyter_url + "lab?token=" + self._jupyter_token
         )
         return tab_status
-
+    
+    def _launcher_args(self):
+        launch_args = ["docker", "run"]
+        if self._software_in_container("Stata"):
+            print("It looks like you want to use Stata in your Docker image!")
+            print("We will open a file browser. Please select your Stata license file ...")
+            time.sleep(3)
+            launch_args.append("--platform")
+            launch_args.append("linux/amd64")
+            stata_lic = self._get_stata_license()
+            launch_args.append("-v")
+            launch_args.append(f"{stata_lic}:/usr/local/stata/stata.lic")
+        return launch_args
+    
     def _rstudio_kill(self, force=True):
         if not self._active_rstudio_session:
             return True
@@ -95,16 +143,17 @@ class ResourceManager:
             tab_status = webbrowser.open_new_tab(self._rstudio_url)
             return tab_status
         rstudio_container = "docker_rstudio"
-        container = subprocess.run(
-            [
-                "docker", "run", "-d", "--name", f"{rstudio_container}",
-                "-p", "8787:8787", "-e", "ROOT=true", "-e",
-                "DISABLE_AUTH=true",
-                (self._image_builder._repository + ":" + self._image_builder._image_tag),
-                "/init"
-            ],
-            capture_output=True
-        )
+        args = self._launcher_args()
+        addtl_args = [
+            "-d", "--name", f"{rstudio_container}",
+            "-p", "8787:8787", "-e", "ROOT=true", "-e",
+            "DISABLE_AUTH=true",
+            (self._image_builder._repository + ":" + self._image_builder._image_tag),
+            "/init"
+        ]
+        for a in addtl_args:
+            args.append(a)
+        container = subprocess.run(args, capture_output=True)
         container.check_returncode()
         self._active_rstudio_session = True
         self._rstudio_container = rstudio_container

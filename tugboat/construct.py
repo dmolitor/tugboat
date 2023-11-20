@@ -40,6 +40,7 @@ class DockerfileGenerator:
         self._dockerfile = ""
         self._dockerignore = ""
         self._using_existing_dockerfile = False
+        self._build_arch_amd64 = False
     
     def _dockerignore_create(self, *args):
         dockerignore = (
@@ -92,8 +93,18 @@ class DockerfileGenerator:
     
     def _dockerfile_prelude(self):
         r_version = self._software_version("R", "latest")
+        if "Stata" in self.requirements:
+            stata_version = self._software_version("Stata", "18")
+            stata_docker_tag = self._stata_dockerfile_tag(stata_version)
+            prelude = (
+                "FROM --platform=linux/amd64 dataeditors/stata"
+                + f"{stata_version}:{stata_docker_tag} as stata_image\n"
+            )
+        else:
+            prelude = ""
         prelude = (
-            f"FROM rocker/r-ver:{r_version}"
+            prelude
+            + f"FROM rocker/r-ver:{r_version}"
             + "\n\n"
             + "SHELL [\"/bin/bash\", \"-c\"]"
             + "\n\n"
@@ -370,6 +381,20 @@ class DockerfileGenerator:
         )
         return sys_deps
     
+    def _dockerfile_stata(self):
+        stata_install = (
+            "RUN apt-get update && \\"
+            + "\n    apt-get install -y locales \\"
+            + "\n    libncurses5 \\"
+            + "\n    libcurl4 \\"
+            + "\n    libfontconfig1"
+            + "\nCOPY --from=stata_image /usr/local/stata/ /usr/local/stata/"
+            + "\nENV PATH=/usr/local/stata:${PATH}\n\n"
+        )
+        if not "Stata" in self.requirements:
+            stata_install = ""
+        return stata_install
+    
     def _dockerfile_workdir(self):
         workdir = "WORKDIR ./tugboat_dir\n\n"
         return workdir
@@ -440,6 +465,19 @@ class DockerfileGenerator:
                 version = default
         return version
     
+    def _stata_dockerfile_tag(self, stata_version):
+        version_tag_dict = {
+            "18": "2023-10-04",
+            "17": "2023-08-29",
+            "16": "2023-06-13",
+            "15": "2023-01-27",
+            "14": "2021-06-02",
+            "13": "2021-06-02"
+        }
+        if stata_version not in version_tag_dict.keys():
+            raise Exception(f"{stata_version} is an invalid Stata version")
+        return version_tag_dict.get(stata_version)
+    
     def dockerfile_create(self):
         print(f"Creating Dockerfile from {os.path.abspath('.')}")
         self._software_check(self.requirements)
@@ -447,6 +485,7 @@ class DockerfileGenerator:
             self._dockerfile_prelude()
             + self._dockerfile_system_dependencies()
             + self._dockerfile_python()
+            + self._dockerfile_stata()
             + self._dockerfile_rstudio()
             + self._dockerfile_pandoc()
             + self._dockerfile_quarto()

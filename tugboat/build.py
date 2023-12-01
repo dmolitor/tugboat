@@ -247,11 +247,7 @@ class ImageBuilder:
         
         # Now push the Docker image
         if not self._dryrun:
-            run_args = ["docker", "push"]
-            if self._amd64:
-                run_args.append("--platform")
-                run_args.append("linux/amd64")
-            run_args.append(image_id)
+            run_args = ["docker", "push", image_id]
             subprocess.run(run_args, check=True)
         
         # Update attributes

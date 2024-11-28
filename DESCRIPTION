@@ -1,9 +1,21 @@
 Package: tugboat
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Build a Docker Image from a Directory or Project
+Version: 0.0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person(given = "Daniel",
+           family = "Molitor",
+           role = c("aut", "cre"),
+           email = "molitdj97@gmail.com")
+Description: Simple utilities to generate a Dockerfile from a directory or
+    project, build the corresponding Docker image, and push the image to
+    DockerHub.
+Imports:
+    dockerfiler (>= 0.2.2),
+    here,
+    renv (>= 1.0.0)
+Suggests:
+    yaml,
+    rmarkdown
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

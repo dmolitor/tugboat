@@ -13,7 +13,7 @@
 #' @param build_args A vector of strings specifying additional build arguments
 #'   to pass to the `docker buildx build` command. Optional.
 #' @param build_context The directory that is the build context for the
-#'   image(s). Default value is the directory of the Dockerfile.
+#'   image(s). Default value is the directory returned by [here::here].
 #' @param push A boolean indicating whether to push to DockerHub.
 #' @param dh_username A string specifying the DockerHub username. Only
 #'   necessary if `push == TRUE`.
@@ -26,7 +26,7 @@ build <- function(
   tag = "latest",
   platforms = c("linux/amd64", "linux/arm64"),
   build_args = NULL,
-  build_context = dirname(dockerfile),
+  build_context = here::here(),
   push = FALSE,
   dh_username = NULL,
   dh_password = NULL
@@ -64,7 +64,6 @@ build <- function(
     build_context,
     if (push) "--push" else NULL
   )
-  cat(paste("docker", paste0(exec_args, collapse = " ")))
   system2(
     "docker",
     exec_args,

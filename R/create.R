@@ -1,4 +1,78 @@
-lockfile <- renv::snapshot(project = NULL, type = "implicit")
+#' Create a Dockerfile
+#' 
+#' This function will crawl all files in the current project/directory and
+#' (attempt to) detect all R packages and store these in a lockfile. From this
+#' lockfile, it will create a corresponding Dockerfile. It will also copy
+#' the full contents of the current directory/project into the Docker image.
+#' The directory in the Docker container containing the current directory
+#' contents will be /current-directory-name. For example if your analysis
+#' directory is named `incredible_analysis`, the corresponding location in
+#' the generated Docker image will be `/incredible_analysis`.
+#' 
+#' @param project The project directory. If no project directory is provided, 
+#'   by default, the [here] package will be used to determine the active
+#'   project. If no project is currently active, then [here] defaults to
+#'   the working directory where initially called.
+#' @param project_args A list of all additional arguments which are passed
+#'   directly to [renv::snapshot]. Please see the documentation for that
+#'   function for all relevant details.
+#' @param as The file path to write to. If NULL (the default), the Dockerfile
+#'   will not be written.
+#' @param ... Additional arguments for creating the Dockerfile that are passed
+#'   directly to [dockerfiler::dock_from_renv]. Please see the documentation
+#'   for that function for all relevant details.
+#' @param exclude A vector of strings specifying all paths (files or
+#'   directories) that should NOT be included in the Docker image. By default,
+#'   all files in the directory will be included. NOTE: the file and directory
+#'   paths should be relative to the project directory. They do NOT need to
+#'   be absolute paths.
+#' 
+#' @return A [dockerfiler::Dockerfile] object. You can then use this to do any
+#'   further actions supported by the [dockerfiler] package.
+#' @seealso [here::here]; this will be used by default to determine the current
+#'   project directory.
+#' @seealso [renv::snapshot] which this function relies on to find all R
+#'   dependencies and create a corresponding lockfile.
+#' @examples
+#' \dontrun{
+#' # Create a Dockerfile based on the rocker/rstudio image.
+#' # Write the Dockerfile locally to here::here("Dockerfile").
+#' # Copy all files except the /data and /examples directories.
+#' dock <- create(
+#'   project = here::here(),
+#'   FROM = "rocker/rstudio",
+#'   as = here::here("Dockerfile"),
+#'   exclude = c("/data", "/examples")
+#' )
+#' }
+#' @export
+create <- function(
+  project = here::here(),
+  project_args = NULL,
+  as = NULL,
+  ...,
+  exclude = NULL
+) {
+  lockfile <- do.call(init_renv, c(list(project = project), project_args))
+  dockerfiler_args <- list(...)
+  if ("use_pak" %in% names(dockerfiler_args)) {
+    use_pak <- dockerfiler_args$use_pak
+    dockerfiler_args$use_pak <- NULL
+  } else {
+    use_pak <- TRUE
+  }
+  dock <- do.call(
+    dockerfiler::dock_from_renv,
+    args = c(list(lockfile = lockfile, use_pak = use_pak), dockerfiler_args)
+  )
+  write_dockerignore(
+    c(exclude, c("Dockerfile", ".dockerignore", "**/.DS_Store")),
+    project = project
+  )
+  dock$COPY(".", paste0("/", basename(project)))
+  if (!is.null(as)) dock$write(as = as)
+  return(dock)
+}
 
 #' Create an renv lockfile
 #' 
@@ -22,7 +96,6 @@ lockfile <- renv::snapshot(project = NULL, type = "implicit")
 #' \dontrun{
 #' init_renv()
 #' }
-#' @export
 init_renv <- function(
   project = NULL,
   lockfile = renv::paths$lockfile(project = project),
@@ -32,61 +105,8 @@ init_renv <- function(
   return(lockfile)
 }
 
-
-#' Create a Dockerfile
-#' 
-#' This function will crawl all files in the current project/directory and
-#' (attempt to) detect all R packages and store these in a lockfile. From this
-#' lockfile, it will create a corresponding Dockerfile.
-#' 
-#' @path project The project directory. If no project directory is provided, 
-#'   by default, the [here] package will be used to determine the active
-#'   project. If no project is currently active, then [here] defaults to
-#'   the working directory where initially called.
-#' @param project_args A list of all additional arguments which are passed
-#'   directly to [renv::snapshot]. Please see the documentation for that
-#'   function for all relevant details.
-#' @param as The file path to write to. If NULL (the default), the Dockerfile
-#'   will not be written.
-#' @param ... Additional arguments for creating the Dockerfile that are passed
-#'   directly to [dockerfiler::dock_from_renv]. Please see the documentation
-#'   for that function for all relevant details.
-#' 
-#' @return A [dockerfiler::Dockerfile] object. You can then use this to do any
-#'   further actions supported by the [dockerfiler] package.
-#' @seealso [here::here]; this will be used by default to determine the current
-#'   project directory.
-#' @seealso [renv::snapshot] which this function relies on to find all R
-#'   dependencies and create a corresponding lockfile.
-#' @examples
-#' \dontrun{
-#' # Create a Dockerfile based on the rocker/rstudio image
-#' dock <- create(project = here::here(), FROM = "rocker/rstudio")
-#' # Write the Dockerfile locally
-#' dock$write(as = here::here("Dockerfile"))
-#' # Run the image locally with RStudio mounted on port 8787
-#' 
-#' }
-#' @export
-create <- function(
-  project = here::here(),
-  project_args = NULL,
-  as = NULL,
-  ...
-) {
-  lockfile <- do.call(init_renv, c(list(project = project), project_args))
-  dockerfiler_args <- list(...)
-  if ("use_pak" %in% names(dockerfiler_args)) {
-    use_pak <- dockerfiler_args$use_pak
-    dockerfiler_args$use_pak <- NULL
-  } else {
-    use_pak <- TRUE
-  }
-  dock <- dockerfiler::dock_from_renv(
-    lockfile = lockfile,
-    use_pak =  use_pak,
-    ...
-  )
-  if (!is.null(as)) dock$write(as = as)
-  return(dock)
+write_dockerignore <- function(exclude, project) {
+  if (is.null(exclude)) return(TRUE)
+  writeLines(exclude, file.path(project, ".dockerignore"))
+  invisible(TRUE)
 }

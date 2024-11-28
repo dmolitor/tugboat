@@ -115,3 +115,8 @@ Note: If you choose to push, you also need to provide your DockerHub
 username and password. Typically you don't want to pass these in
 directly and should instead use environment variables (or a similar
 method) instead.
+
+### Examples
+
+For some worked examples of how to use tugboat in practice, see the
+`examples/` directory.

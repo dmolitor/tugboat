@@ -1,7 +1,7 @@
 # tugboat
 
 A simple R package to generate a Dockerfile and corresponding Docker image
-from an analysis directory. tugboat uses the `renv` package to automatically
+from an analysis directory. tugboat uses the [renv](https://github.com/rstudio/renv) package to automatically
 detect all the packages necessary to replicate your analysis and will generate
 a Dockerfile that contains an exact copy of your entire directory with all
 the packages installed.
@@ -51,36 +51,27 @@ be included in the Docker image. This is particularly important when you have,
 for example, large data directories that you plan to mount to a container
 instead of including them in the Docker image.
 
-Below I'll outline a couple examples. The first example
-is the simplest scenario where your analysis directory is your current
-active project, you are fine with the default base
-["rocker/r-base"](https://rocker-project.org/images/base/r-base.html)
-Docker image, and you want to include all files/directories:
+Below I'll outline a couple examples.
 ```r
 library(tugboat)
 
+# The simplest scenario where your analysis directory is your current
+# active project, you are fine with the default base "rocker/r-base"
+# Docker image, and you want to include all files/directories:
 create()
-```
 
-Suppose your analysis directory is actually a sub-directory of your
-main project directory:
-```r
+# Suppose your analysis directory is actually a sub-directory of your
+# main project directory:
 create(project = here::here("sub-directory"))
-```
 
-Suppose that you specifically need a Docker base image that has RStudio
-installed so that you can interact with your analysis in a natural environment
-within a Docker container. To do this, we will pass additional arguments
-directly to the
-[`dockerfiler::dock_from_renv`](https://thinkr-open.github.io/dockerfiler/reference/dock_from_renv.html)
-function.
-```r
+# Suppose that you specifically need a Docker base image that has RStudio
+# installed so that you can interact with your analysis within a Docker 
+# container. To do this, we will pass additional arguments directly to the
+# `dockerfiler::dock_from_renv function.
 create(FROM = "rocker/rstudio")
-```
 
-Finally, suppose that we want to include all files except a couple
-particularly data-heavy sub-directories:
-```r
+# Finally, suppose that we want to include all files except a couple
+# particularly data-heavy sub-directories:
 create(exclue = c("data/big_directory_1", "data/big_directory_2"))
 ```
 

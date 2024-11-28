@@ -7,7 +7,7 @@
 create(
   project = here::here(),
   project_args = NULL,
-  as = NULL,
+  as = file.path(project, "Dockerfile"),
   ...,
   exclude = NULL
 )
@@ -22,8 +22,9 @@ the working directory where initially called.}
 directly to \link[renv:snapshot]{renv::snapshot}. Please see the documentation for that
 function for all relevant details.}
 
-\item{as}{The file path to write to. If NULL (the default), the Dockerfile
-will not be written.}
+\item{as}{The file path to write to. If NULL, the Dockerfile
+will not be written. The default value is
+\code{file.path(project, "Dockerfile")}.}
 
 \item{...}{Additional arguments for creating the Dockerfile that are passed
 directly to \link[dockerfiler:dock_from_renv]{dockerfiler::dock_from_renv}. Please see the documentation
@@ -31,7 +32,9 @@ for that function for all relevant details.}
 
 \item{exclude}{A vector of strings specifying all paths (files or
 directories) that should NOT be included in the Docker image. By default,
-all files in the directory will be included.}
+all files in the directory will be included. NOTE: the file and directory
+paths should be relative to the project directory. They do NOT need to
+be absolute paths.}
 }
 \value{
 A \link[dockerfiler:Dockerfile]{dockerfiler::Dockerfile} object. You can then use this to do any
@@ -40,7 +43,12 @@ further actions supported by the \link{dockerfiler} package.
 \description{
 This function will crawl all files in the current project/directory and
 (attempt to) detect all R packages and store these in a lockfile. From this
-lockfile, it will create a corresponding Dockerfile.
+lockfile, it will create a corresponding Dockerfile. It will also copy
+the full contents of the current directory/project into the Docker image.
+The directory in the Docker container containing the current directory
+contents will be /current-directory-name. For example if your analysis
+directory is named \code{incredible_analysis}, the corresponding location in
+the generated Docker image will be \verb{/incredible_analysis}.
 }
 \examples{
 \dontrun{

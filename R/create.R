@@ -16,8 +16,9 @@
 #' @param project_args A list of all additional arguments which are passed
 #'   directly to [renv::snapshot]. Please see the documentation for that
 #'   function for all relevant details.
-#' @param as The file path to write to. If NULL (the default), the Dockerfile
-#'   will not be written.
+#' @param as The file path to write to. If NULL, the Dockerfile
+#'   will not be written. The default value is
+#'   `file.path(project, "Dockerfile")`.
 #' @param ... Additional arguments for creating the Dockerfile that are passed
 #'   directly to [dockerfiler::dock_from_renv]. Please see the documentation
 #'   for that function for all relevant details.
@@ -49,7 +50,7 @@
 create <- function(
   project = here::here(),
   project_args = NULL,
-  as = NULL,
+  as = file.path(project, "Dockerfile"),
   ...,
   exclude = NULL
 ) {

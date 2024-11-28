@@ -1,0 +1,51 @@
+---
+title: "Bolasso example"
+format:
+  html:
+    code-fold: false
+    self-contained: true
+    toc: true
+    toc-depth: 3
+---
+
+### Load requisite packages and data
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(bolasso)
+library(mlbench)
+
+data(PimaIndiansDiabetes, package = "mlbench")
+
+# Quick overview of the dataset
+str(PimaIndiansDiabetes)
+```
+
+First, let's create a train/test split of our data, and then run 100-fold
+bootstrapped Lasso with `glmnet`.
+
+```{r}
+train_idx <- sample(1:nrow(PimaIndiansDiabetes), round(0.7*nrow(PimaIndiansDiabetes)))
+train <- PimaIndiansDiabetes[train_idx, ]
+test <- PimaIndiansDiabetes[-train_idx, ]
+
+model <- bolasso(
+  diabetes ~ .,
+  data = train,
+  n.boot = 100,
+  progress = FALSE,
+  family = "binomial"
+)
+```
+
+
+### Variable selection
+
+Print selected variables:
+```{r}
+selected_vars(model, threshold = 0.9, select = "lambda.min")
+```
+
+Plot selection thresholds:
+```{r}
+plot(model, threshold = 0.9)
+```

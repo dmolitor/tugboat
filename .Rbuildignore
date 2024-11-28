@@ -1,0 +1,7 @@
+^renv$
+^renv\.lock$
+^tugboat\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^\.dockerignore$
+^examples$

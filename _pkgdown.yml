@@ -1,4 +1,5 @@
-url: http://www.dmolitor.com/tugboat/
+url: https://dmolitor.com/tugboat/
 template:
   bootstrap: 5
+  bootswatch: sandstone
 

@@ -85,7 +85,7 @@ where to start, [this is a great starting point](https://colinfay.me/docker-r-re
 The following example will do the simplest thing and will build the
 image locally.
 ```r
-build(image_name = "awsome_analysis")
+build(image_name = "awesome_analysis")
 ```
 
 Suppose that, like above, your analysis directory is a sub-directory of
@@ -104,7 +104,7 @@ the image and then push to DockerHub, you can make a couple small additions
 to the code above:
 ```r
 build(
-  image_name = "awsome_analysis",
+  image_name = "awesome_analysis",
   push = TRUE,
   dh_username = Sys.getenv("DH_USERNAME"),
   dh_password = Sys.getenv("DH_PASSWORD")

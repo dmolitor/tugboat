@@ -14,8 +14,8 @@ create(
 }
 \arguments{
 \item{project}{The project directory. If no project directory is provided,
-by default, the \link{here} package will be used to determine the active
-project. If no project is currently active, then \link{here} defaults to
+by default, the here package will be used to determine the active
+project. If no project is currently active, then here defaults to
 the working directory where initially called.}
 
 \item{project_args}{A list of all additional arguments which are passed
@@ -38,7 +38,7 @@ be absolute paths.}
 }
 \value{
 A \link[dockerfiler:Dockerfile]{dockerfiler::Dockerfile} object. You can then use this to do any
-further actions supported by the \link{dockerfiler} package.
+further actions supported by the dockerfiler package.
 }
 \description{
 This function will crawl all files in the current project/directory and

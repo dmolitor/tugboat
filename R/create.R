@@ -10,8 +10,8 @@
 #' the generated Docker image will be `/incredible_analysis`.
 #' 
 #' @param project The project directory. If no project directory is provided, 
-#'   by default, the [here] package will be used to determine the active
-#'   project. If no project is currently active, then [here] defaults to
+#'   by default, the here package will be used to determine the active
+#'   project. If no project is currently active, then here defaults to
 #'   the working directory where initially called.
 #' @param project_args A list of all additional arguments which are passed
 #'   directly to [renv::snapshot]. Please see the documentation for that
@@ -29,7 +29,7 @@
 #'   be absolute paths.
 #' 
 #' @returns A [dockerfiler::Dockerfile] object. You can then use this to do any
-#'   further actions supported by the [dockerfiler] package.
+#'   further actions supported by the dockerfiler package.
 #' @seealso [here::here]; this will be used by default to determine the current
 #'   project directory.
 #' @seealso [renv::snapshot] which this function relies on to find all R

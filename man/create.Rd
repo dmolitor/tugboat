@@ -58,7 +58,6 @@ the generated Docker image will be \verb{/incredible_analysis}.
 dock <- create(
   project = here::here(),
   FROM = "rocker/rstudio",
-  as = here::here("Dockerfile"),
   exclude = c("/data", "/examples")
 )
 }

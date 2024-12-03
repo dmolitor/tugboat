@@ -1,6 +1,9 @@
 test_that("Building the Docker image works as expected", {
   testthat::skip_on_ci()
   testthat::skip_on_cran()
+  if (!interactive()) {
+    testthat::skip()
+  }
   image_name <- build(
     dockerfile = here::here("examples/simple/Dockerfile"),
     image_name = "tugboat_simple",

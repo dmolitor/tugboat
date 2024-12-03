@@ -42,7 +42,6 @@
 #' dock <- create(
 #'   project = here::here(),
 #'   FROM = "rocker/rstudio",
-#'   as = here::here("Dockerfile"),
 #'   exclude = c("/data", "/examples")
 #' )
 #' }

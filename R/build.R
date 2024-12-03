@@ -42,8 +42,7 @@ build <- function(
         dh_username
       ),
       intern = FALSE,
-      ignore.stderr = FALSE,
-      receive.console.signals = TRUE
+      ignore.stderr = FALSE
     )
   }
   if (is.null(dh_username)) {
@@ -66,8 +65,7 @@ build <- function(
   )
   system2(
     "docker",
-    exec_args,
-    receive.console.signals = TRUE
+    exec_args
   )
   return(paste0(repository, ":", tag))
 }

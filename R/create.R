@@ -28,7 +28,7 @@
 #'   paths should be relative to the project directory. They do NOT need to
 #'   be absolute paths.
 #' 
-#' @return A [dockerfiler::Dockerfile] object. You can then use this to do any
+#' @returns A [dockerfiler::Dockerfile] object. You can then use this to do any
 #'   further actions supported by the [dockerfiler] package.
 #' @seealso [here::here]; this will be used by default to determine the current
 #'   project directory.

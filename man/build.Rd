@@ -43,6 +43,26 @@ necessary if \code{push == TRUE}.}
 \item{dh_password}{A string specifying the DockerHub password. Only
 necessary if \code{push == TRUE}.}
 }
+\value{
+The name of the built Docker image as a string.
+}
 \description{
 A simple utility to quickly build a Docker image from a Dockerfile.
+}
+\examples{
+\dontrun{
+dock <- create(
+  project = here::here(),
+  FROM = "rocker/rstudio",
+  exclude = c("/data", "/examples")
+)
+
+image_name <- build(
+  dockerfile = here::here("Dockerfile"),
+  image_name = "awesome_analysis",
+  push = TRUE,
+  dh_username = Sys.getenv("DH_USERNAME"),
+  dh_password = Sys.getenv("DH_PASSWORD")
+)
+}
 }

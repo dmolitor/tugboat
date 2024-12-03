@@ -19,6 +19,23 @@
 #'   necessary if `push == TRUE`.
 #' @param dh_password A string specifying the DockerHub password. Only
 #'   necessary if `push == TRUE`.
+#' @returns The name of the built Docker image as a string.
+#' @examples
+#' \dontrun{
+#' dock <- create(
+#'   project = here::here(),
+#'   FROM = "rocker/rstudio",
+#'   exclude = c("/data", "/examples")
+#' )
+#' 
+#' image_name <- build(
+#'   dockerfile = here::here("Dockerfile"),
+#'   image_name = "awesome_analysis",
+#'   push = TRUE,
+#'   dh_username = Sys.getenv("DH_USERNAME"),
+#'   dh_password = Sys.getenv("DH_PASSWORD")
+#' )
+#' }
 #' @export
 build <- function(
   dockerfile = here::here("Dockerfile"),

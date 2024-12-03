@@ -23,3 +23,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 URL: http://www.dmolitor.com/tugboat/
 Config/testthat/edition: 3
+Config/testthat/start-first: create

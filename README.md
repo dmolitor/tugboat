@@ -1,5 +1,10 @@
 # tugboat
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/dmolitor/tugboat/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dmolitor/tugboat/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/dmolitor/tugboat/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/dmolitor/tugboat/actions/workflows/pkgdown.yaml)
+<!-- badges: end -->
+
 A simple R package to generate a Dockerfile and corresponding Docker image
 from an analysis directory. tugboat uses the [renv](https://github.com/rstudio/renv) package to automatically
 detect all the packages necessary to replicate your analysis and will generate

@@ -34,3 +34,4 @@ tugboat.yml
 tugboat.lock
 Dockerfile
 .dockerignore
+docs

@@ -75,28 +75,28 @@ create <- function(
   return(dock)
 }
 
-#' Create an renv lockfile
-#' 
-#' This function is nearly identical to [renv::snapshot], with a couple
-#' tiny tweaks. All arguments are passed directly to [renv::snapshot],
-#' so the functionality is identical.
-#' 
-#' @param project The project directory. If NULL, then the active project
-#'   will be used. If no project is currently active, then the current working
-#'   directory is used instead.
-#' @param lockfile The location where the generated lockfile should be written.
-#'   By default, the lockfile is written to a file called renv.lock in the
-#'   project directory. When NULL, the lockfile (as an R object) is returned
-#'   directly instead.
-#' @param ... All additional arguments are passed directly to [renv::snapshot].
-#'   Please see the documentation for that function for all relevant details.
-#'
-#' @return A string giving the location of the generated lockfile.
-#' @seealso [renv::snapshot] which this function relies on.
-#' @examples
-#' \dontrun{
-#' init_renv()
-#' }
+# Create an renv lockfile
+# 
+# This function is nearly identical to [renv::snapshot], with a couple
+# tiny tweaks. All arguments are passed directly to [renv::snapshot],
+# so the functionality is identical.
+# 
+# @param project The project directory. If NULL, then the active project
+#   will be used. If no project is currently active, then the current working
+#   directory is used instead.
+# @param lockfile The location where the generated lockfile should be written.
+#   By default, the lockfile is written to a file called renv.lock in the
+#   project directory. When NULL, the lockfile (as an R object) is returned
+#   directly instead.
+# @param ... All additional arguments are passed directly to [renv::snapshot].
+#   Please see the documentation for that function for all relevant details.
+#
+# @return A string giving the location of the generated lockfile.
+# @seealso [renv::snapshot] which this function relies on.
+# @examples
+# \dontrun{
+# init_renv()
+# }
 init_renv <- function(
   project = NULL,
   lockfile = renv::paths$lockfile(project = project),

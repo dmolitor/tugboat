@@ -16,8 +16,7 @@ Imports:
 Suggests:
     yaml,
     rmarkdown,
-    testthat (>= 3.0.0),
-    spelling
+    testthat (>= 3.0.0)
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

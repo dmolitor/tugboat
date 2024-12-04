@@ -35,3 +35,4 @@ tugboat.lock
 Dockerfile
 .dockerignore
 docs
+CRAN-SUBMISSION

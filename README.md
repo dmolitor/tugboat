@@ -7,12 +7,12 @@
 <!-- badges: end -->
 
 A simple R package to generate a Dockerfile and corresponding Docker image
-from an analysis directory. tugboat uses the [renv](https://github.com/rstudio/renv) package to automatically
+from an analysis directory. tugboat uses the [renv](https://github.com/rstudio/renv/) package to automatically
 detect all the packages necessary to replicate your analysis and will generate
 a Dockerfile that contains an exact copy of your entire directory with all
 the packages installed.
 
-tugboat builds directly on the [dockerfiler](https://github.com/ThinkR-open/dockerfiler)
+tugboat builds directly on the [dockerfiler](https://github.com/ThinkR-open/dockerfiler/)
 package which generates Dockerfiles from DESCRIPTION files or from `renv.lock`
 files. tugboat adds the sugar of converting an unstructured analysis folder
 into the necessary `renv.lock` file and then relies on dockerfiler to do
@@ -47,7 +47,7 @@ function that are of particular importance:
 the Dockerfile from. You can set this value yourself, or you can just use
 the default value. By default, tugboat uses the `here::here` function to
 determine what directory is the project directory. To get a detailed understanding
-of exactly how this works take a look at the [here package](https://github.com/r-lib/here)
+of exactly how this works take a look at the [here package](https://github.com/r-lib/here/)
 but in general, this "just works"!
 - `as`: This argument tells tugboat where to save the Dockerfile. In
 general you don't need to set this and tugboat will just save the

@@ -1,4 +1,4 @@
-# tugboat <img src='man/figures/logo-no-bg.png' align="right" height="200"/>
+# tugboat <img src='man/figures/logo-no-bg.png' align="right" height="175"/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/dmolitor/tugboat/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dmolitor/tugboat/actions/workflows/R-CMD-check.yaml)

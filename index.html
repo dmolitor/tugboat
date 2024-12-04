@@ -13,6 +13,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Build a Docker Image from a Directory or Project">
 <meta name="description" content="Simple utilities to generate a Dockerfile from a directory or project, build the corresponding Docker image, and push the image to DockerHub.">
 <meta property="og:description" content="Simple utilities to generate a Dockerfile from a directory or project, build the corresponding Docker image, and push the image to DockerHub.">
+<meta property="og:image" content="https://dmolitor.com/tugboat/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -46,8 +47,10 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="tugboat">tugboat<a class="anchor" aria-label="anchor" href="#tugboat"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="tugboat">tugboat<a class="anchor" aria-label="anchor" href="#tugboat"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
 <p>A simple R package to generate a Dockerfile and corresponding Docker image from an analysis directory. tugboat uses the <a href="https://github.com/rstudio/renv/" class="external-link">renv</a> package to automatically detect all the packages necessary to replicate your analysis and will generate a Dockerfile that contains an exact copy of your entire directory with all the packages installed.</p>

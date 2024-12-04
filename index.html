@@ -50,8 +50,8 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>A simple R package to generate a Dockerfile and corresponding Docker image from an analysis directory. tugboat uses the <a href="https://github.com/rstudio/renv" class="external-link">renv</a> package to automatically detect all the packages necessary to replicate your analysis and will generate a Dockerfile that contains an exact copy of your entire directory with all the packages installed.</p>
-<p>tugboat builds directly on the <a href="https://github.com/ThinkR-open/dockerfiler" class="external-link">dockerfiler</a> package which generates Dockerfiles from DESCRIPTION files or from <code>renv.lock</code> files. tugboat adds the sugar of converting an unstructured analysis folder into the necessary <code>renv.lock</code> file and then relies on dockerfiler to do the rest.</p>
+<p>A simple R package to generate a Dockerfile and corresponding Docker image from an analysis directory. tugboat uses the <a href="https://github.com/rstudio/renv/" class="external-link">renv</a> package to automatically detect all the packages necessary to replicate your analysis and will generate a Dockerfile that contains an exact copy of your entire directory with all the packages installed.</p>
+<p>tugboat builds directly on the <a href="https://github.com/ThinkR-open/dockerfiler/" class="external-link">dockerfiler</a> package which generates Dockerfiles from DESCRIPTION files or from <code>renv.lock</code> files. tugboat adds the sugar of converting an unstructured analysis folder into the necessary <code>renv.lock</code> file and then relies on dockerfiler to do the rest.</p>
 <p>tugboat may be of use, for example, when preparing a replication package for research. With tugboat, you can take a directory on your local computer and quickly generate a Dockerfile and Docker image that contains all the code and the necessary software to reproduce your findings.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -71,7 +71,7 @@
 <p>The primary function from tugboat is <code>create</code>. This function will turn your analysis directory into a Dockerfile that includes all your code and essential R packages. For the most common cases, there are a couple arguments in this function that are of particular importance:</p>
 <ul>
 <li>
-<code>project</code>: This argument tells tugboat which directory is the one to generate the Dockerfile from. You can set this value yourself, or you can just use the default value. By default, tugboat uses the <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code> function to determine what directory is the project directory. To get a detailed understanding of exactly how this works take a look at the <a href="https://github.com/r-lib/here" class="external-link">here package</a> but in general, this “just works”!</li>
+<code>project</code>: This argument tells tugboat which directory is the one to generate the Dockerfile from. You can set this value yourself, or you can just use the default value. By default, tugboat uses the <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code> function to determine what directory is the project directory. To get a detailed understanding of exactly how this works take a look at the <a href="https://github.com/r-lib/here/" class="external-link">here package</a> but in general, this “just works”!</li>
 <li>
 <code>as</code>: This argument tells tugboat where to save the Dockerfile. In general you don’t need to set this and tugboat will just save the Dockerfile in the <code>project</code> directory from above.</li>
 <li>

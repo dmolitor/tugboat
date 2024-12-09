@@ -25,7 +25,12 @@ code and the necessary software to reproduce your findings.
 
 ## Installation
 
-Install tugboat with
+Install tugboat from CRAN:
+```r
+install.packages("tugboat")
+```
+
+Or install the development version from GitHub:
 ```r
 # install.packages("pak")
 pak::pkg_install("dmolitor/tugboat")

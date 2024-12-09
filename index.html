@@ -59,8 +59,11 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install tugboat with</p>
+<p>Install tugboat from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tugboat"</span><span class="op">)</span></span></code></pre></div>
+<p>Or install the development version from GitHub:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pkg_install.html" class="external-link">pkg_install</a></span><span class="op">(</span><span class="st">"dmolitor/tugboat"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -81,7 +84,7 @@
 <code>exclude</code>: A vector of files or directories that should <strong><em>NOT</em></strong> be included in the Docker image. This is particularly important when you have, for example, large data directories that you plan to mount to a container instead of including them in the Docker image.</li>
 </ul>
 <p>Below I’ll outline a couple examples.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.dmolitor.com/tugboat/" class="external-link">tugboat</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The simplest scenario where your analysis directory is your current</span></span>
@@ -108,10 +111,10 @@
 </h3>
 <p>Once the Dockerfile has been created, we can build the Docker image. By default this will infer the Dockerfile directory using <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code>. This function assumes a little knowledge about Docker; if you aren’t sure where to start, <a href="https://colinfay.me/docker-r-reproducibility/" class="external-link">this is a great starting point</a>.</p>
 <p>The following example will do the simplest thing and will build the image locally.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/build.html">build</a></span><span class="op">(</span>image_name <span class="op">=</span> <span class="st">"awesome_analysis"</span><span class="op">)</span></span></code></pre></div>
 <p>Suppose that, like above, your analysis directory is a sub-directory of your main project directory:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/build.html">build</a></span><span class="op">(</span></span>
 <span>  dockerfile <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"sub-directory"</span><span class="op">)</span>,</span>
 <span>  image_name <span class="op">=</span> <span class="st">"awesome_analysis"</span></span>
@@ -121,7 +124,7 @@
 <h3 id="push-to-dockerhub">Push to DockerHub<a class="anchor" aria-label="anchor" href="#push-to-dockerhub"></a>
 </h3>
 <p>If, instead of just building the Docker image locally, you want to build the image and then push to DockerHub, you can make a couple small additions to the code above:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/build.html">build</a></span><span class="op">(</span></span>
 <span>  image_name <span class="op">=</span> <span class="st">"awesome_analysis"</span>,</span>
 <span>  push <span class="op">=</span> <span class="cn">TRUE</span>,</span>

@@ -74,14 +74,16 @@
 <div class="section level3">
 <h3 id="create-the-dockerfile">Create the Dockerfile<a class="anchor" aria-label="anchor" href="#create-the-dockerfile"></a>
 </h3>
-<p>The primary function from tugboat is <code>create</code>. This function will turn your analysis directory into a Dockerfile that includes all your code and essential R packages. For the most common cases, there are a couple arguments in this function that are of particular importance:</p>
+<p>The primary function from tugboat is <code><a href="reference/create.html">create()</a></code>. This function converts your analysis directory into a Dockerfile that includes all your code and essential R packages.</p>
+<p>This function scans all files in the current analysis directory, attempts to detect all R packages, and installs these packages in the resulting Docker image. It also copies the entire contents of the analysis directory into the Docker image. For example, if your analysis directory is named <code>incredible_analysis</code>, the corresponding location of your code and data files in the generated Docker image will be <code>/incredible_analysis</code>.</p>
+<p>For the most common use-cases, there are a couple of arguments in this function that are particularly important:</p>
 <ul>
 <li>
-<code>project</code>: This argument tells tugboat which directory is the one to generate the Dockerfile from. You can set this value yourself, or you can just use the default value. By default, tugboat uses the <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code> function to determine what directory is the project directory. To get a detailed understanding of exactly how this works take a look at the <a href="https://github.com/r-lib/here/" class="external-link">here package</a> but in general, this “just works”!</li>
+<code>project</code>: This argument tells tugboat which directory is the one to generate the Dockerfile from. You can set this value yourself, or you can just use the default value. By default, tugboat uses the <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code> function to determine what directory is the analysis directory. To get a detailed understanding of exactly how this works take a look at the <a href="https://github.com/r-lib/here/" class="external-link">here package</a>. In general, this “just works”!</li>
 <li>
 <code>as</code>: This argument tells tugboat where to save the Dockerfile. In general you don’t need to set this and tugboat will just save the Dockerfile in the <code>project</code> directory from above.</li>
 <li>
-<code>exclude</code>: A vector of files or directories that should <strong><em>NOT</em></strong> be included in the Docker image. This is particularly important when you have, for example, large data directories that you plan to mount to a container instead of including them in the Docker image.</li>
+<code>exclude</code>: A vector of files or sub-directories in your analysis directory that should <strong><em>NOT</em></strong> be included in the Docker image. This is particularly important when you have, for example, a sub-directory with large data files that would make the resulting Docker image extremely large if included. You can tell tugboat to exclude this sub-directory and then simply mount it to a Docker container as needed.</li>
 </ul>
 <p>Below I’ll outline a couple examples.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -109,7 +111,7 @@
 <div class="section level3">
 <h3 id="build-the-docker-image">Build the Docker image<a class="anchor" aria-label="anchor" href="#build-the-docker-image"></a>
 </h3>
-<p>Once the Dockerfile has been created, we can build the Docker image. By default this will infer the Dockerfile directory using <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code>. This function assumes a little knowledge about Docker; if you aren’t sure where to start, <a href="https://colinfay.me/docker-r-reproducibility/" class="external-link">this is a great starting point</a>.</p>
+<p>Once the Dockerfile has been created, we can build the Docker image with the <code><a href="reference/build.html">build()</a></code> function. By default this will infer the Dockerfile directory using <code><a href="https://here.r-lib.org//reference/here.html" class="external-link">here::here</a></code>. This function assumes a little knowledge about Docker; if you aren’t sure where to start, <a href="https://colinfay.me/docker-r-reproducibility/" class="external-link">this is a great starting point</a>.</p>
 <p>The following example will do the simplest thing and will build the image locally.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/build.html">build</a></span><span class="op">(</span>image_name <span class="op">=</span> <span class="st">"awesome_analysis"</span><span class="op">)</span></span></code></pre></div>
@@ -140,7 +142,14 @@
 </div>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=tugboat" class="external-link">View on CRAN</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>

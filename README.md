@@ -43,24 +43,36 @@ analysis directory, and one to build the corresponding Docker image.
 
 ### Create the Dockerfile
 
-The primary function from tugboat is `create`. This function will turn your
-analysis directory into a Dockerfile that includes all your code and essential
-R packages. For the most common cases, there are a couple arguments in this
-function that are of particular importance:
+The primary function from tugboat is `create()`. This function converts 
+your analysis directory into a Dockerfile that includes all your code 
+and essential R packages.
+
+This function scans all files in the current analysis directory,
+attempts to detect all R packages, and installs these packages in
+the resulting Docker image. It also copies the entire contents of the
+analysis directory into the Docker image. For example, if
+your analysis directory is named `incredible_analysis`, the corresponding
+location of your code and data files in the generated Docker image will
+be `/incredible_analysis`.
+
+For the most common use-cases, there are a couple of arguments in this
+function that are particularly important:
 
 - `project`: This argument tells tugboat which directory is the one to generate
 the Dockerfile from. You can set this value yourself, or you can just use
 the default value. By default, tugboat uses the `here::here` function to
-determine what directory is the project directory. To get a detailed understanding
-of exactly how this works take a look at the [here package](https://github.com/r-lib/here/)
-but in general, this "just works"!
+determine what directory is the analysis directory. To get a detailed understanding
+of exactly how this works take a look at the [here package](https://github.com/r-lib/here/).
+In general, this "just works"!
 - `as`: This argument tells tugboat where to save the Dockerfile. In
 general you don't need to set this and tugboat will just save the
 Dockerfile in the `project` directory from above.
-- `exclude`: A vector of files or directories that should ***NOT***
-be included in the Docker image. This is particularly important when you have,
-for example, large data directories that you plan to mount to a container
-instead of including them in the Docker image.
+- `exclude`: A vector of files or sub-directories in your analysis directory
+that should ***NOT*** be included in the Docker image. This is particularly
+important when you have, for example, a sub-directory with large data files
+that would make the resulting Docker image extremely large if included. You
+can tell tugboat to exclude this sub-directory and then simply mount it to
+a Docker container as needed.
 
 Below I'll outline a couple examples.
 ```r
@@ -88,10 +100,11 @@ create(exclue = c("data/big_directory_1", "data/big_directory_2"))
 
 ### Build the Docker image
 
-Once the Dockerfile has been created, we can build the Docker image.
-By default this will infer the Dockerfile directory using `here::here`.
-This function assumes a little knowledge about Docker; if you aren't sure
-where to start, [this is a great starting point](https://colinfay.me/docker-r-reproducibility/).
+Once the Dockerfile has been created, we can build the Docker image
+with the `build()` function. By default this will infer the Dockerfile
+directory using `here::here`. This function assumes a little knowledge
+about Docker; if you aren't sure where to start,
+[this is a great starting point](https://colinfay.me/docker-r-reproducibility/).
 
 The following example will do the simplest thing and will build the
 image locally.

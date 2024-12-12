@@ -95,7 +95,7 @@ create(FROM = "rocker/rstudio")
 
 # Finally, suppose that we want to include all files except a couple
 # particularly data-heavy sub-directories:
-create(exclue = c("data/big_directory_1", "data/big_directory_2"))
+create(exclude = c("data/big_directory_1", "data/big_directory_2"))
 ```
 
 ### Build the Docker image

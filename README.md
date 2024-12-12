@@ -140,7 +140,39 @@ username and password. Typically you don't want to pass these in
 directly and should instead use environment variables (or a similar
 method) instead.
 
-### Examples
+## Why tugboat? 🚢
+
+There are a few available packages with similar goals, so why tugboat?
+tugboat is minimal and builds directly on top of
+[`renv`](https://rstudio.github.io/renv/articles/renv.html),
+[`pak`](https://pak.r-lib.org/), and
+[`dockerfiler`](https://github.com/ThinkR-open/dockerfiler).
+Each of these packages is actively maintained and provides specific
+utilities that the tugboat utilizes for maximum convenience.
+tugboat aims to leverage packages that are likely to remain actively
+maintained and handle dependency management as seamlessly as possible.
+
+- [containerit](https://o2r.info/containerit/) is a robust package that is
+directly comparable to tugboat. However, it implements its own method for
+discovering R package dependencies instead of using renv. It also relies on
+[sysreqsdb](https://github.com/r-hub/sysreqsdb) for system dependency
+discovery, which has been archived in favor of
+[r-system-requirements](https://github.com/rstudio/r-system-requirements),
+which pak is built on. It also isn't super actively maintained and isn't on
+CRAN.
+
+- [holepunch](https://github.com/karthik/holepunch) is related but focuses
+on making GitHub repositories Binder-compatible. It currently relies on MRAN,
+which is now obsolete, and does not use pak for system dependency management.
+It is also not actively maintained and is not on CRAN.
+
+- [automagic](https://github.com/cole-brokamp/automagic) focuses on
+automatically detecting and installing R package dependencies but uses its own
+method rather than relying on renv. automagic also has no utilities for
+creating/building Docker images.
+
+
+## Examples
 
 For some worked examples of how to use tugboat in practice, see the
 `examples/` directory.

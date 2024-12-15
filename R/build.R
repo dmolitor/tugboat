@@ -43,7 +43,7 @@ build <- function(
   tag = "latest",
   platforms = c("linux/amd64", "linux/arm64"),
   build_args = NULL,
-  build_context = dirname(dockerfile),
+  build_context = here::here(),
   push = FALSE,
   dh_username = NULL,
   dh_password = NULL

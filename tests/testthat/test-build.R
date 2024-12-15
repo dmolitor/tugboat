@@ -1,7 +1,7 @@
 test_that("Expected installed packages are in the Docker image", {
   testthat::skip_on_cran()
-  if (!interactive() && Sys.info()[["sysname"]] != "Linux") {
-    skip("Tests only run interactively or on Ubuntu (Linux)")
+  if (!interactive()) {
+    skip("Tests only run interactively")
   }
   
   image_name <- build(
@@ -32,8 +32,8 @@ test_that("Expected installed packages are in the Docker image", {
 
 test_that("Dockerfile in a different directory than build context works correctly", {
   testthat::skip_on_cran()
-  if (!interactive() && Sys.info()[["sysname"]] != "Linux") {
-    skip("Tests only run interactively or on Ubuntu (Linux)")
+  if (!interactive()) {
+    skip("Tests only run interactively")
   }
 
   if (file.exists(here::here("examples/diff_dockerfile_and_context/docker/Dockerfile"))) {

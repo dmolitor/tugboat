@@ -79,7 +79,9 @@ init_renv <- function(
   lockfile = renv::paths$lockfile(project = project),
   ...
 ) {
-  if (!interactive()) renv::install(project = project)
+  if (!interactive()) {
+    renv::install(project = project, exclude = basename(project))
+  }
   snap <- renv::snapshot(project = project, lockfile = lockfile, ...)
   return(lockfile)
 }

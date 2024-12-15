@@ -1,9 +1,9 @@
 test_that("Creating a Dockerfile works as expected", {
-  testthat::skip_on_ci()
   testthat::skip_on_cran()
-  if (!interactive()) {
-    testthat::skip()
+  if (!interactive() && Sys.info()[["sysname"]] != "Linux") {
+    skip("Tests only run interactively or on Ubuntu (Linux)")
   }
+  
   if (file.exists(here::here("examples/simple/Dockerfile"))) {
     file.remove(here::here("examples/simple/Dockerfile"))
   }

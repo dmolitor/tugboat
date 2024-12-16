@@ -9,12 +9,5 @@ Win-builder: R-devel, R-release
 
 ## R CMD check results
 
-0 errors | 0 warnings | 2 notes
-
-* New submission
-* Possibly misspelled words in DESCRIPTION:
-    DockerHub (11:5)
-    Dockerfile (9:45)
-This second note mentions two properly spelled proper nouns, which
-I was instructed to include without single quotes.
+0 errors | 0 warnings | 0 notes
 

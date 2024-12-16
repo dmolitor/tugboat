@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">tugboat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <!-- badges: start -->
 
 <p>A simple R package to generate a Dockerfile and corresponding Docker image from an analysis directory. tugboat uses the <a href="https://github.com/rstudio/renv/" class="external-link">renv</a> package to automatically detect all the packages necessary to replicate your analysis and will generate a Dockerfile that contains an exact copy of your entire directory with all the packages installed.</p>
-<p>tugboat builds directly on the <a href="https://github.com/ThinkR-open/dockerfiler/" class="external-link">dockerfiler</a> package which generates Dockerfiles from DESCRIPTION files or from <code>renv.lock</code> files. tugboat adds the sugar of converting an unstructured analysis folder into the necessary <code>renv.lock</code> file and then relies on dockerfiler to do the rest.</p>
+<p>tugboat transforms an unstructured analysis folder into a renv.lock file and constructs a Docker image that includes all your essential R packages based on this lockfile.</p>
 <p>tugboat may be of use, for example, when preparing a replication package for research. With tugboat, you can take a directory on your local computer and quickly generate a Dockerfile and Docker image that contains all the code and the necessary software to reproduce your findings.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -90,7 +90,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.dmolitor.com/tugboat/" class="external-link">tugboat</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The simplest scenario where your analysis directory is your current</span></span>
-<span><span class="co"># active project, you are fine with the default base "rocker/r-base"</span></span>
+<span><span class="co"># active project, you are fine with the default base "r-base:latest"</span></span>
 <span><span class="co"># Docker image, and you want to include all files/directories:</span></span>
 <span><span class="fu"><a href="reference/create.html">create</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -139,7 +139,7 @@
 <div class="section level2">
 <h2 id="why-tugboat-">Why tugboat? 🚢<a class="anchor" aria-label="anchor" href="#why-tugboat-"></a>
 </h2>
-<p>There are a few available packages with similar goals, so why tugboat? tugboat is minimal and builds directly on top of <a href="https://rstudio.github.io/renv/articles/renv.html" class="external-link"><code>renv</code></a>, <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a>, and <a href="https://github.com/ThinkR-open/dockerfiler" class="external-link"><code>dockerfiler</code></a>. Each of these packages is actively maintained and provides specific utilities that the tugboat utilizes for maximum convenience. tugboat aims to leverage packages that are likely to remain actively maintained and handle dependency management as seamlessly as possible.</p>
+<p>There are a few available packages with similar goals, so why tugboat? tugboat is minimal and builds directly on top of <a href="https://rstudio.github.io/renv/articles/renv.html" class="external-link"><code>renv</code></a> and <a href="https://pak.r-lib.org/" class="external-link"><code>pak</code></a>. Each of these packages is actively maintained and provides specific utilities that the tugboat utilizes for maximum convenience. tugboat aims to leverage packages that are likely to remain actively maintained and handle dependency management as seamlessly as possible.</p>
 <ul>
 <li><p><a href="https://o2r.info/containerit/" class="external-link">containerit</a> is a robust package that is directly comparable to tugboat. However, it implements its own method for discovering R package dependencies instead of using renv. It also relies on <a href="https://github.com/r-hub/sysreqsdb" class="external-link">sysreqsdb</a> for system dependency discovery, which has been archived in favor of <a href="https://github.com/rstudio/r-system-requirements" class="external-link">r-system-requirements</a>, which pak is built on. It also isn’t super actively maintained and isn’t on CRAN.</p></li>
 <li><p><a href="https://github.com/karthik/holepunch" class="external-link">holepunch</a> is related but focuses on making GitHub repositories Binder-compatible. It currently relies on MRAN, which is now obsolete, and does not use pak for system dependency management. It is also not actively maintained and is not on CRAN.</p></li>

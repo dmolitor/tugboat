@@ -73,21 +73,3 @@ create <- function(
   if (!is.null(as)) dock$write(as = as)
   return(dock)
 }
-
-init_renv <- function(
-  project = NULL,
-  lockfile = renv::paths$lockfile(project = project),
-  ...
-) {
-  if (!interactive()) {
-    renv::install(project = project, exclude = basename(project))
-  }
-  snap <- renv::snapshot(project = project, lockfile = lockfile, ...)
-  return(lockfile)
-}
-
-write_dockerignore <- function(exclude, project) {
-  if (is.null(exclude)) return(TRUE)
-  writeLines(exclude, file.path(project, ".dockerignore"))
-  invisible(TRUE)
-}

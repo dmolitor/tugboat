@@ -12,11 +12,9 @@ detect all the packages necessary to replicate your analysis and will generate
 a Dockerfile that contains an exact copy of your entire directory with all
 the packages installed.
 
-tugboat builds directly on the [dockerfiler](https://github.com/ThinkR-open/dockerfiler/)
-package which generates Dockerfiles from DESCRIPTION files or from `renv.lock`
-files. tugboat adds the sugar of converting an unstructured analysis folder
-into the necessary `renv.lock` file and then relies on dockerfiler to do
-the rest.
+tugboat transforms an unstructured analysis folder into a renv.lock file
+and constructs a Docker image that includes all your essential R packages
+based on this lockfile.
 
 tugboat may be of use, for example, when preparing a replication package for
 research. With tugboat, you can take a directory on your local computer
@@ -79,7 +77,7 @@ Below I'll outline a couple examples.
 library(tugboat)
 
 # The simplest scenario where your analysis directory is your current
-# active project, you are fine with the default base "rocker/r-base"
+# active project, you are fine with the default base "r-base:latest"
 # Docker image, and you want to include all files/directories:
 create()
 
@@ -144,9 +142,8 @@ method) instead.
 
 There are a few available packages with similar goals, so why tugboat?
 tugboat is minimal and builds directly on top of
-[`renv`](https://rstudio.github.io/renv/articles/renv.html),
-[`pak`](https://pak.r-lib.org/), and
-[`dockerfiler`](https://github.com/ThinkR-open/dockerfiler).
+[`renv`](https://rstudio.github.io/renv/articles/renv.html) and
+[`pak`](https://pak.r-lib.org/).
 Each of these packages is actively maintained and provides specific
 utilities that the tugboat utilizes for maximum convenience.
 tugboat aims to leverage packages that are likely to remain actively

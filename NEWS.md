@@ -15,6 +15,9 @@ when running in non-interactive mode. This resolves the issue where
 being run non-interactively, thus potentially leaving essential packages out of
 the Docker image.
 
+- tugboat no longer relies on the dockerfiler package. This allows support for a
+much wider range of base images and minimizes the dependencies for tugboat.
+
 # tugboat 0.1.0
 
 * Initial CRAN submission.

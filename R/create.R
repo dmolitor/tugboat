@@ -13,27 +13,24 @@
 #'   by default, the here package will be used to determine the active
 #'   project. If no project is currently active, then here defaults to
 #'   the working directory where initially called.
-#' @param project_args A list of all additional arguments which are passed
-#'   directly to [renv::snapshot]. Please see the documentation for that
-#'   function for all relevant details.
-#' @param as The file path to write to. If NULL, the Dockerfile
-#'   will not be written. The default value is
+#' @param as The file path to write to. The default value is
 #'   `file.path(project, "Dockerfile")`.
-#' @param ... Additional arguments for creating the Dockerfile that are passed
-#'   directly to [dockerfiler::dock_from_renv]. Please see the documentation
-#'   for that function for all relevant details.
+#' @param FROM Docker image to start FROM. Default is FROM r-base:R.version.
+#' @param ... Additional arguments which are passed directly to
+#'   [renv::snapshot]. Please see the documentation for that function for all
+#'   relevant details.
 #' @param exclude A vector of strings specifying all paths (files or
 #'   directories) that should NOT be included in the Docker image. By default,
 #'   all files in the directory will be included. NOTE: the file and directory
 #'   paths should be relative to the project directory. They do NOT need to
 #'   be absolute paths.
 #' 
-#' @returns A [dockerfiler::Dockerfile] object. You can then use this to do any
-#'   further actions supported by the dockerfiler package.
 #' @seealso [here::here]; this will be used by default to determine the current
 #'   project directory.
 #' @seealso [renv::snapshot] which this function relies on to find all R
 #'   dependencies and create a corresponding lockfile.
+#' @returns The Dockerfile contained as a string vector. Each vector element
+#'   corresponds to a line in the Dockerfile.
 #' @examples
 #' \dontrun{
 #' # Create a Dockerfile based on the rocker/rstudio image.
@@ -45,31 +42,22 @@
 #'   exclude = c("/data", "/examples")
 #' )
 #' }
+#' 
 #' @export
 create <- function(
   project = here::here(),
-  project_args = NULL,
   as = file.path(project, "Dockerfile"),
+  FROM = NULL,
   ...,
   exclude = NULL
 ) {
-  lockfile <- do.call(init_renv, c(list(project = project), project_args))
-  dockerfiler_args <- list(...)
-  if ("use_pak" %in% names(dockerfiler_args)) {
-    use_pak <- dockerfiler_args$use_pak
-    dockerfiler_args$use_pak <- NULL
-  } else {
-    use_pak <- TRUE
-  }
-  dock <- do.call(
-    dockerfiler::dock_from_renv,
-    args = c(list(lockfile = lockfile, use_pak = use_pak), dockerfiler_args)
-  )
+  lockfile <- init_renv(project = project, ...)
+  dock <- dockerfile(lockfile, FROM = FROM)
+  dock <- c(dock, paste("COPY .", paste0("/", basename(project))), "")
   write_dockerignore(
     c(exclude, c("Dockerfile", ".dockerignore", "**/.DS_Store")),
     project = project
   )
-  dock$COPY(".", paste0("/", basename(project)))
-  if (!is.null(as)) dock$write(as = as)
+  if (!is.null(as)) writeLines(dock, con = as)
   return(dock)
 }

@@ -6,8 +6,8 @@
 \usage{
 create(
   project = here::here(),
-  project_args = NULL,
   as = file.path(project, "Dockerfile"),
+  FROM = NULL,
   ...,
   exclude = NULL
 )
@@ -18,17 +18,14 @@ by default, the here package will be used to determine the active
 project. If no project is currently active, then here defaults to
 the working directory where initially called.}
 
-\item{project_args}{A list of all additional arguments which are passed
-directly to \link[renv:snapshot]{renv::snapshot}. Please see the documentation for that
-function for all relevant details.}
-
-\item{as}{The file path to write to. If NULL, the Dockerfile
-will not be written. The default value is
+\item{as}{The file path to write to. The default value is
 \code{file.path(project, "Dockerfile")}.}
 
-\item{...}{Additional arguments for creating the Dockerfile that are passed
-directly to \link[dockerfiler:dock_from_renv]{dockerfiler::dock_from_renv}. Please see the documentation
-for that function for all relevant details.}
+\item{FROM}{Docker image to start FROM. Default is FROM r-base:R.version.}
+
+\item{...}{Additional arguments which are passed directly to
+\link[renv:snapshot]{renv::snapshot}. Please see the documentation for that function for all
+relevant details.}
 
 \item{exclude}{A vector of strings specifying all paths (files or
 directories) that should NOT be included in the Docker image. By default,
@@ -37,8 +34,8 @@ paths should be relative to the project directory. They do NOT need to
 be absolute paths.}
 }
 \value{
-A \link[dockerfiler:Dockerfile]{dockerfiler::Dockerfile} object. You can then use this to do any
-further actions supported by the dockerfiler package.
+The Dockerfile contained as a string vector. Each vector element
+corresponds to a line in the Dockerfile.
 }
 \description{
 This function will crawl all files in the current project/directory and
@@ -61,6 +58,7 @@ dock <- create(
   exclude = c("/data", "/examples")
 )
 }
+
 }
 \seealso{
 \link[here:here]{here::here}; this will be used by default to determine the current

@@ -24,7 +24,7 @@
 #' \dontrun{
 #' dock <- create(
 #'   project = here::here(),
-#'   FROM = "rocker/rstudio",
+#'   FROM = "rstudio/r-base:devel-bookworm",
 #'   exclude = c("/data", "/examples")
 #' )
 #' 

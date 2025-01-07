@@ -87,8 +87,8 @@ create(project = here::here("sub-directory"))
 
 # Suppose that you specifically need a Docker base image that has RStudio
 # installed so that you can interact with your analysis within a Docker 
-# container. To do this, we will pass additional arguments directly to the
-# `dockerfiler::dock_from_renv function.
+# container. To do this, we will explicitly specify a different Docker
+# base image using the `FROM` argument.
 create(FROM = "rocker/rstudio")
 
 # Finally, suppose that we want to include all files except a couple

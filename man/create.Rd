@@ -9,7 +9,8 @@ create(
   as = file.path(project, "Dockerfile"),
   FROM = NULL,
   ...,
-  exclude = NULL
+  exclude = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ directories) that should NOT be included in the Docker image. By default,
 all files in the directory will be included. NOTE: the file and directory
 paths should be relative to the project directory. They do NOT need to
 be absolute paths.}
+
+\item{verbose}{A boolean indicating whether or not to print the resulting
+Dockerfile to the console. Default value is \code{FALSE}.}
 }
 \value{
 The Dockerfile contained as a string vector. Each vector element

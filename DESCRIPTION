@@ -1,6 +1,6 @@
 Package: tugboat
 Title: Build a Docker Image from a Directory or Project
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: 
     person(given = "Daniel",
            family = "Molitor",

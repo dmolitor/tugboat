@@ -24,6 +24,8 @@
 #'   all files in the directory will be included. NOTE: the file and directory
 #'   paths should be relative to the project directory. They do NOT need to
 #'   be absolute paths.
+#' @param verbose A boolean indicating whether or not to print the resulting
+#'   Dockerfile to the console. Default value is `FALSE`.
 #' 
 #' @seealso [here::here]; this will be used by default to determine the current
 #'   project directory.
@@ -49,7 +51,8 @@ create <- function(
   as = file.path(project, "Dockerfile"),
   FROM = NULL,
   ...,
-  exclude = NULL
+  exclude = NULL,
+  verbose = FALSE
 ) {
   lockfile <- init_renv(project = project, ...)
   dock <- dockerfile(lockfile, FROM = FROM)
@@ -59,5 +62,6 @@ create <- function(
     project = project
   )
   if (!is.null(as)) writeLines(dock, con = as)
-  return(dock)
+  if (verbose) cat(dock, sep = "\n")
+  invisible(dock)
 }

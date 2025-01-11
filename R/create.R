@@ -59,5 +59,6 @@ create <- function(
     project = project
   )
   if (!is.null(as)) writeLines(dock, con = as)
-  return(dock)
+  cat(dock, sep = "\n")
+  invisible(dock)
 }

@@ -1,3 +1,8 @@
+# tugboat 0.1.2
+
+- Added argument `verbose` to the `tugboat::create()` function. If
+`verbose = TRUE`, the resulting Dockerfile will be printed to the R console.
+
 # tugboat 0.1.1
 
 - In `tugboat::build()` the default value for the build_context is now

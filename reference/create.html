@@ -21,7 +21,7 @@ the generated Docker image will be /incredible_analysis."><meta property="og:ima
 
     <a class="navbar-brand me-2" href="../index.html">tugboat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,7 +63,8 @@ the generated Docker image will be <code>/incredible_analysis</code>.</p>
 <span>  as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">project</span>, <span class="st">"Dockerfile"</span><span class="op">)</span>,</span>
 <span>  FROM <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  exclude <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,6 +100,11 @@ directories) that should NOT be included in the Docker image. By default,
 all files in the directory will be included. NOTE: the file and directory
 paths should be relative to the project directory. They do NOT need to
 be absolute paths.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>A boolean indicating whether or not to print the resulting
+Dockerfile to the console. Default value is <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

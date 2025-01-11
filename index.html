@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">tugboat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,8 +100,8 @@
 <span></span>
 <span><span class="co"># Suppose that you specifically need a Docker base image that has RStudio</span></span>
 <span><span class="co"># installed so that you can interact with your analysis within a Docker </span></span>
-<span><span class="co"># container. To do this, we will pass additional arguments directly to the</span></span>
-<span><span class="co"># `dockerfiler::dock_from_renv function.</span></span>
+<span><span class="co"># container. To do this, we will explicitly specify a different Docker</span></span>
+<span><span class="co"># base image using the `FROM` argument.</span></span>
 <span><span class="fu"><a href="reference/create.html">create</a></span><span class="op">(</span>FROM <span class="op">=</span> <span class="st">"rocker/rstudio"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Finally, suppose that we want to include all files except a couple</span></span>

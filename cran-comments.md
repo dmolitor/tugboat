@@ -1,8 +1,8 @@
 # Test environments
 
-local macOS 14.3.1 install: R-release
+local macOS 15.6.1 install: R-release
 Ubuntu 24.04 (on GitHub actions): R-devel, R-release, R-oldrel
-macOS 14.7.1 (on GitHub actions): R-devel
+macOS-latest (on GitHub actions): R-devel
 Windows Server 2022 (on GitHub actions): R-devel
 Win-builder: R-devel, R-release
 

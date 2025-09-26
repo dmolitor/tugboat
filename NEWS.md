@@ -1,3 +1,13 @@
+# tugboat 0.1.3
+
+- Added better support for binaries via `pak`. Still some limitations when
+using less common Linux distributions (e.g. Alpine) or older distributions
+(e.g. Debian 11). However, for up-to-date Debian and Ubuntu distributions,
+this should be fairly seemless and should result in potentially huge
+installation speedups. See [PPM documentation](https://packagemanager.posit.co/__docs__/admin/serving-binaries.html)
+and [related GitHub issues](https://github.com/hadley/r-in-production/issues/22)
+for some light bedtime reading on this subject.
+
 # tugboat 0.1.2
 
 - Added argument `verbose` to the `tugboat::create()` function. If

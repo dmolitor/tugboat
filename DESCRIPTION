@@ -1,6 +1,6 @@
 Package: tugboat
 Title: Build a Docker Image from a Directory or Project
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: 
     person(given = "Daniel",
            family = "Molitor",
@@ -19,7 +19,7 @@ Suggests:
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 URL: https://www.dmolitor.com/tugboat/
 Config/testthat/edition: 3
 Config/testthat/start-first: create

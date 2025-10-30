@@ -1,6 +1,6 @@
 Package: tugboat
 Title: Build a Docker Image from a Directory or Project
-Version: 0.1.3
+Version: 0.1.4
 Authors@R: 
     person(given = "Daniel",
            family = "Molitor",
@@ -13,6 +13,8 @@ Imports:
     here,
     renv (>= 1.0.0)
 Suggests:
+    gert,
+    usethis,
     yaml,
     rmarkdown,
     testthat (>= 3.0.0)

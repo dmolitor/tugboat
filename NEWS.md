@@ -1,3 +1,8 @@
+# tugboat 0.1.4
+
+- Adds preliminary Binder support. See the new `binderize()` function and
+its corresponding documentation.
+
 # tugboat 0.1.3
 
 - Added better support for binaries via `pak`. Still some limitations when

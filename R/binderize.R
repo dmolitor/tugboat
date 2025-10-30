@@ -68,9 +68,6 @@ prep_binder_dockerfile <- function(dockerfile, root) {
 #'   Defaults to `"rstudio"`, which opens an RStudio Server session.
 #' @param add_readme_badge Logical. Whether to add a Binder launch badge to the README.
 #'   Defaults to `TRUE`.
-#' @param commit_changes Logical. Whether to automatically commit local Binder-related changes.
-#'   If `TRUE`, the function will attempt to commit changes and instruct the
-#'   user to push them before launching Binder. Defaults to `TRUE`.
 #'
 #' @return Invisibly returns `NULL`. Called primarily for its side effects of creating
 #'   Binder-related files and optionally committing them.
@@ -90,8 +87,7 @@ prep_binder_dockerfile <- function(dockerfile, root) {
 #' binderize(
 #'   dockerfile = here::here("Dockerfile"),
 #'   branch = "main",
-#'   add_readme_badge = TRUE,
-#'   commit_changes = TRUE
+#'   add_readme_badge = TRUE
 #' )
 #' }
 #'
@@ -101,8 +97,7 @@ binderize <- function(
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",
-  add_readme_badge = TRUE,
-  commit_changes = TRUE
+  add_readme_badge = TRUE
 ) {
   hub <- match.arg(hub, c("mybinder.org")) # Add more hubs if interested later
   check_if_installed("gert")
@@ -132,22 +127,8 @@ binderize <- function(
     check_if_installed("usethis")
     usethis::use_badge("Launch RStudio Binder", binder_url, badge_url)
   }
-  if (commit_changes) {
-    commit_files <- file.path(local_repo, ".binder/Dockerfile")
-    if (add_readme_badge) {
-      readme_path <- path_first_existing(usethis::proj_path(c("README.Rmd", "README.md")))
-      commit_files <- c(commit_files, readme_path)
-    }
-    tryCatch({
-      gert::git_add(commit_files)
-      gert::git_commit("Adding Binder support")
-      message("Changes committed. Push changes and then launch Binder at: ", binder_url)
-    },
-    error = function(e) {
-      message("Automatic commit failed. Commit and push changes manually, then launch Binder at: ", binder_url)
-    })
-  } else {
-    message("Binder files created locally. Commit and push changes manually, then launch Binder at: ", binder_url)
-  }
+  message("Your repository has been configured for Binder.")
+  message("[x] Commit and push all changes")
+  message("[x] Launch Binder at: ", binder_url)
   return(invisible(NULL))
 }

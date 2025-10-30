@@ -9,8 +9,7 @@ binderize(
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",
-  add_readme_badge = TRUE,
-  commit_changes = TRUE
+  add_readme_badge = TRUE
 )
 }
 \arguments{
@@ -26,10 +25,6 @@ Defaults to \code{"rstudio"}, which opens an RStudio Server session.}
 
 \item{add_readme_badge}{Logical. Whether to add a Binder launch badge to the README.
 Defaults to \code{TRUE}.}
-
-\item{commit_changes}{Logical. Whether to automatically commit local Binder-related changes.
-If \code{TRUE}, the function will attempt to commit changes and instruct the
-user to push them before launching Binder. Defaults to \code{TRUE}.}
 }
 \value{
 Invisibly returns \code{NULL}. Called primarily for its side effects of creating
@@ -64,8 +59,7 @@ launching Binder; otherwise, the build will not reflect local modifications.
 binderize(
   dockerfile = here::here("Dockerfile"),
   branch = "main",
-  add_readme_badge = TRUE,
-  commit_changes = TRUE
+  add_readme_badge = TRUE
 )
 }
 

@@ -54,8 +54,7 @@ commit these changes automatically.</p>
 <span>  branch <span class="op">=</span> <span class="st">"main"</span>,</span>
 <span>  hub <span class="op">=</span> <span class="st">"mybinder.org"</span>,</span>
 <span>  urlpath <span class="op">=</span> <span class="st">"rstudio"</span>,</span>
-<span>  add_readme_badge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  commit_changes <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  add_readme_badge <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -84,12 +83,6 @@ Defaults to <code>"rstudio"</code>, which opens an RStudio Server session.</p></
 <dt id="arg-add-readme-badge">add_readme_badge<a class="anchor" aria-label="anchor" href="#arg-add-readme-badge"></a></dt>
 <dd><p>Logical. Whether to add a Binder launch badge to the README.
 Defaults to <code>TRUE</code>.</p></dd>
-
-
-<dt id="arg-commit-changes">commit_changes<a class="anchor" aria-label="anchor" href="#arg-commit-changes"></a></dt>
-<dd><p>Logical. Whether to automatically commit local Binder-related changes.
-If <code>TRUE</code>, the function will attempt to commit changes and instruct the
-user to push them before launching Binder. Defaults to <code>TRUE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -128,8 +121,7 @@ launching Binder; otherwise, the build will not reflect local modifications.</p>
 <span class="r-in"><span><span class="fu">binderize</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  dockerfile <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"Dockerfile"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  branch <span class="op">=</span> <span class="st">"main"</span>,</span></span>
-<span class="r-in"><span>  add_readme_badge <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  commit_changes <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  add_readme_badge <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

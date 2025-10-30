@@ -18,7 +18,7 @@ based on this lockfile.
 
 tugboat may be of use, for example, when preparing a replication package for
 research. With tugboat, you can take a directory on your local computer
-and quickly generate a Dockerfile and Docker image that contains all the
+and quickly generate a corresponding Dockerfile and Docker image that contains all the
 code and the necessary software to reproduce your findings.
 
 ## Installation

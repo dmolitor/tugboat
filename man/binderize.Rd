@@ -5,7 +5,7 @@
 \title{Create Binder-Compatible Docker Configuration for a tugboat Project}
 \usage{
 binderize(
-  dockerfile = here::here("examples/bolasso/Dockerfile"),
+  dockerfile = here::here("Dockerfile"),
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",

@@ -37,6 +37,7 @@ prep_binder_dockerfile <- function(dockerfile, root) {
   if (!dir.exists(binder_df_dir)) {
     dir.create(binder_df_dir)
   }
+  df <- c(df, "COPY --chown=${NB_USER} . /home/rstudio")
   writeLines(df, file.path(binder_df_dir, "Dockerfile"))
 }
 
@@ -96,7 +97,7 @@ prep_binder_dockerfile <- function(dockerfile, root) {
 #'
 #' @export
 binderize <- function(
-  dockerfile = here::here("examples/bolasso/Dockerfile"),
+  dockerfile = here::here("Dockerfile"),
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",
@@ -113,9 +114,6 @@ binderize <- function(
     sub(".*github.com[:/](.*)\\.git$", "\\1", git_remote),
     "/"
   )[[1]]
-  if (!same_dir(local_repo, dockerfile)) {
-    stop("The specified Dockerfile must be in the root directory of the repository")
-  }
   if (grepl("github.com", git_remote)) {
     binder_url <- sprintf(
       "https://%s/v2/gh/%s/%s?urlpath=%s",
@@ -146,10 +144,10 @@ binderize <- function(
       message("Changes committed. Push changes and then launch Binder at: ", binder_url)
     },
     error = function(e) {
-      message("Automatic commit failed. Please commit and push changes manually, then launch Binder at: ", binder_url)
+      message("Automatic commit failed. Commit and push changes manually, then launch Binder at: ", binder_url)
     })
   } else {
-    message("Binder files created locally. Please commit and push changes manually, then launch Binder at: ", binder_url)
+    message("Binder files created locally. Commit and push changes manually, then launch Binder at: ", binder_url)
   }
   return(invisible(NULL))
 }

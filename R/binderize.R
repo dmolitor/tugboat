@@ -25,6 +25,8 @@ path_first_existing <- function(paths) {
 }
 
 prep_binder_dockerfile <- function(dockerfile, root) {
+  target_path <- file.path(binder_df_dir, "Dockerfile")
+  if (file.exists(target_path)) return(invisible(NULL))
   df <- readLines(dockerfile)
   from_idx <- grep("^FROM\\s+", df)
   if (length(from_idx) == 0) {
@@ -38,7 +40,8 @@ prep_binder_dockerfile <- function(dockerfile, root) {
     dir.create(binder_df_dir)
   }
   df <- c(df, "COPY --chown=${NB_USER} . /home/rstudio")
-  writeLines(df, file.path(binder_df_dir, "Dockerfile"))
+  writeLines(df, target_path)
+  return(invisible(NULL))
 }
 
 #' Create Binder-Compatible Docker Configuration for a tugboat Project

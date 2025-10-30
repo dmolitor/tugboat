@@ -25,6 +25,7 @@ path_first_existing <- function(paths) {
 }
 
 prep_binder_dockerfile <- function(dockerfile, root) {
+  binder_df_dir <- file.path(root, ".binder")
   target_path <- file.path(binder_df_dir, "Dockerfile")
   if (file.exists(target_path)) return(invisible(NULL))
   df <- readLines(dockerfile)
@@ -35,7 +36,6 @@ prep_binder_dockerfile <- function(dockerfile, root) {
   # Hard-code the max R major version to 4 until rocker supports > 4
   r_major <- as.character(min(as.integer(R.Version()$major), 4))
   df[[from_idx[[1]]]] <- paste0("FROM rocker/binder:", r_major)
-  binder_df_dir <- file.path(root, ".binder")
   if (!dir.exists(binder_df_dir)) {
     dir.create(binder_df_dir)
   }

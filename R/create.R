@@ -24,6 +24,10 @@
 #'   all files in the directory will be included. NOTE: the file and directory
 #'   paths should be relative to the project directory. They do NOT need to
 #'   be absolute paths.
+#' @param optimize_pak A boolean indicating whether or not to try to optimize
+#'   package installations with pak. Defaults to `TRUE`. This may, in rare cases
+#'   cause issues when building the Docker image. When encountering build issues,
+#'   re-create the Dockerfile with `optimize_pak = FALSE` to potentially resolve.
 #' @param verbose A boolean indicating whether or not to print the resulting
 #'   Dockerfile to the console. Default value is `FALSE`.
 #' 
@@ -52,10 +56,11 @@ create <- function(
   FROM = NULL,
   ...,
   exclude = NULL,
+  optimize_pak = TRUE,
   verbose = FALSE
 ) {
   lockfile <- init_renv(project = project, ...)
-  dock <- dockerfile(lockfile, FROM = FROM)
+  dock <- dockerfile(lockfile, FROM = FROM, optimize_pak = optimize_pak)
   dock <- c(dock, paste("COPY .", paste0("/", basename(project))), "")
   write_dockerignore(
     c(exclude, c("Dockerfile", ".dockerignore", "**/.DS_Store")),

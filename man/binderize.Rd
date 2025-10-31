@@ -2,7 +2,7 @@
 % Please edit documentation in R/binderize.R
 \name{binderize}
 \alias{binderize}
-\title{Create Binder-Compatible Docker Configuration for a tugboat Project}
+\title{Prepare project for Binder}
 \usage{
 binderize(
   dockerfile = here::here("Dockerfile"),
@@ -34,19 +34,14 @@ Binder-related files and optionally committing them.
 The \code{binderize()} function converts an existing tugboat project into a
 \href{https://mybinder.org}{Binder}–compatible project by creating a Dockerfile
 that launches RStudio Server via the \code{rocker/binder} base image.
-Optionally, it can add a Binder launch badge to the project's README and
-commit these changes automatically.
+Optionally, it can add a Binder launch badge to the project's README.
 }
 \details{
 This enables one-click, cloud-based execution of your R analysis environment
 directly from GitHub using Binder.
 
-The function assumes the specified Dockerfile resides in the root of a valid
-Git repository (currently only GitHub repositories are supported). It generates
-a Binder-compatible Dockerfile.
-
-If \code{add_readme_badge = TRUE}, a Binder badge will be appended to the README file,
-linking directly to the live Binder instance.
+Currently only GitHub repositories are supported. If \code{add_readme_badge = TRUE},
+a Binder badge will be appended to the README file, linking to the live Binder instance.
 }
 \note{
 Binder can only build from the remote GitHub repository.
@@ -55,7 +50,6 @@ launching Binder; otherwise, the build will not reflect local modifications.
 }
 \examples{
 \dontrun{
-# Create a Binder-compatible RStudio environment for your project
 binderize(
   dockerfile = here::here("Dockerfile"),
   branch = "main",

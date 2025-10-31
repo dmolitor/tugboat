@@ -10,6 +10,7 @@ create(
   FROM = NULL,
   ...,
   exclude = NULL,
+  optimize_pak = TRUE,
   verbose = FALSE
 )
 }
@@ -33,6 +34,11 @@ directories) that should NOT be included in the Docker image. By default,
 all files in the directory will be included. NOTE: the file and directory
 paths should be relative to the project directory. They do NOT need to
 be absolute paths.}
+
+\item{optimize_pak}{A boolean indicating whether or not to try to optimize
+package installations with pak. Defaults to \code{TRUE}. This may, in rare cases
+cause issues when building the Docker image. When encountering build issues,
+re-create the Dockerfile with \code{optimize_pak = FALSE} to potentially resolve.}
 
 \item{verbose}{A boolean indicating whether or not to print the resulting
 Dockerfile to the console. Default value is \code{FALSE}.}

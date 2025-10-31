@@ -64,8 +64,8 @@ the generated Docker image will be <code>/incredible_analysis</code>.</p>
 <span>  FROM <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  optimize_pak <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  optimize_pak <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,16 +103,17 @@ paths should be relative to the project directory. They do NOT need to
 be absolute paths.</p></dd>
 
 
-<dt id="arg-optimize-pak">optimize_pak<a class="anchor" aria-label="anchor" href="#arg-optimize-pak"></a></dt>
-<dd><p>A boolean indicating whether or not to try to optimize
-package installations with pak. Defaults to <code>TRUE</code>. This may, in rare cases
-cause issues when building the Docker image. When encountering build issues,
-re-create the Dockerfile with <code>optimize_pak = FALSE</code> to potentially resolve.</p></dd>
-
-
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>A boolean indicating whether or not to print the resulting
 Dockerfile to the console. Default value is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-optimize-pak">optimize_pak<a class="anchor" aria-label="anchor" href="#arg-optimize-pak"></a></dt>
+<dd><p>A boolean indicating whether or not to try to optimize
+package installations with pak. Defaults to <code>TRUE</code>. This should rarely be
+changed from its default value. However, sometimes this optimization may
+cause build failures. When encountering a build error, a good first step
+can be to set <code>optimize_pak = FALSE</code> and see if the error persists.</p></dd>
 
 </dl></div>
     <div class="section level2">

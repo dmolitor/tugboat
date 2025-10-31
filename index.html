@@ -53,8 +53,8 @@
 </div>
 <!-- badges: start -->
 
-<p>A simple R package to generate a Dockerfile and corresponding Docker image from an analysis directory. tugboat uses the <a href="https://github.com/rstudio/renv/" class="external-link">renv</a> package to automatically detect all the packages necessary to replicate your analysis and will generate a Dockerfile that contains an exact copy of your entire directory with all the packages installed.</p>
-<p>tugboat transforms an unstructured analysis folder into a renv.lock file and constructs a Docker image that includes all your essential R packages based on this lockfile.</p>
+<p>A simple R package to generate a Dockerfile and corresponding Docker image from an analysis directory. tugboat also prepares your analysis directory to be shared via <a href="https://mybinder.readthedocs.io/en/latest/index.html" class="external-link">Binder</a>.</p>
+<p>tugboat uses the <a href="https://github.com/rstudio/renv/" class="external-link">renv</a> package to automatically detect all the packages necessary to replicate your analysis and will generate a Dockerfile that contains an exact copy of your entire directory with all the packages installed. tugboat transforms an unstructured analysis folder into a renv.lock file and constructs a Docker image that includes all your essential R packages based on this lockfile.</p>
 <p>tugboat may be of use, for example, when preparing a replication package for research. With tugboat, you can take a directory on your local computer and quickly generate a corresponding Dockerfile and Docker image that contains all the code and the necessary software to reproduce your findings.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -70,7 +70,7 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>tugboat only has two exported functions; one to create a Dockerfile from your analysis directory, and one to build the corresponding Docker image.</p>
+<p>tugboat only has three exported functions; one to create a Dockerfile from your analysis directory, one to build the corresponding Docker image, and one to make your project ready to share and run in an online, interactive compute environment via <a href="https://mybinder.readthedocs.io/en/latest/index.html" class="external-link">Binder</a>.</p>
 <div class="section level3">
 <h3 id="create-the-dockerfile">Create the Dockerfile<a class="anchor" aria-label="anchor" href="#create-the-dockerfile"></a>
 </h3>
@@ -134,6 +134,39 @@
 <span>  dh_password <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"DH_PASSWORD"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Note: If you choose to push, you also need to provide your DockerHub username and password. Typically you don’t want to pass these in directly and should instead use environment variables (or a similar method) instead.</p>
+</div>
+<div class="section level3">
+<h3 id="share-your-project-via-binder">Share your project via Binder<a class="anchor" aria-label="anchor" href="#share-your-project-via-binder"></a>
+</h3>
+<p>Binder lets others instantly launch and interact with your R project in a live, cloud-based environment with no local setup required. tugboat will prepare your project to be shared with Binder. The process is simple:</p>
+<ul>
+<li>
+<p>First, create the Dockerfile from your analysis directory:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/create.html">create</a></span><span class="op">(</span></span>
+<span>  project <span class="op">=</span> <span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org/reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  exclude <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"data/big_directory_1"</span>, <span class="st">"data/big_directory_2"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</li>
+<li>
+<p>Then, prep your directory for Binder. Your analysis directory <em>must</em> be a GitHub repository:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/binderize.html">binderize</a></span><span class="op">(</span>branch <span class="op">=</span> <span class="st">"main"</span><span class="op">)</span></span></code></pre></div>
+<p>By default this will add a Binder badge to your README.Rmd or README.md file. If your README file already has a section for badges, it will add the new badge automatically:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>✔ Adding <span class="st">"Launch RStudio Binder badge"</span> to README.md.</span></code></pre></div>
+<p>If your README file does <em>not</em> have a section for badges, it will automatically save the badge to your clipboard and you will need to manually insert it into the README.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>☐ Copy and paste the following lines into README.md<span class="sc">:</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="er">&lt;</span><span class="sc">!--</span> badges<span class="sc">:</span> start <span class="sc">-</span><span class="ot">-&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  [<span class="sc">!</span>[Launch RStudio Binder](https<span class="sc">:</span><span class="er">//</span>mybinder.org<span class="sc">/</span>badge_logo.svg)](https<span class="sc">:</span><span class="er">//</span>mybinder.org<span class="sc">/</span>v2<span class="sc">/</span>gh<span class="sc">/</span>{username}<span class="sc">/</span>{repo}<span class="sc">/</span>{branch}?<span class="at">urlpath=</span>rstudio)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="sc">&lt;!--</span> badges<span class="sc">:</span> end <span class="sc">-</span><span class="ot">-&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  [Copied to clipboard]</span></code></pre></div>
+</li>
+</ul>
+<p>After running <code><a href="reference/binderize.html">binderize()</a></code> you will see the following message:</p>
+<pre><code>Your repository has been configured for Binder.
+[x] Commit and push all changes
+[x] Launch Binder at: https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio</code></pre>
+<p>You must commit and push all changes <em>before</em> visiting the Binder link, otherwise it will likely fail. Binder can automatically detect changes to the repository and will rebuild as necessary, ensuring that the Binder repository stays up to date.</p>
 </div>
 </div>
 <div class="section level2">

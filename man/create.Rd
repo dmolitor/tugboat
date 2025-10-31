@@ -10,8 +10,8 @@ create(
   FROM = NULL,
   ...,
   exclude = NULL,
-  optimize_pak = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  optimize_pak = TRUE
 )
 }
 \arguments{
@@ -35,13 +35,14 @@ all files in the directory will be included. NOTE: the file and directory
 paths should be relative to the project directory. They do NOT need to
 be absolute paths.}
 
-\item{optimize_pak}{A boolean indicating whether or not to try to optimize
-package installations with pak. Defaults to \code{TRUE}. This may, in rare cases
-cause issues when building the Docker image. When encountering build issues,
-re-create the Dockerfile with \code{optimize_pak = FALSE} to potentially resolve.}
-
 \item{verbose}{A boolean indicating whether or not to print the resulting
 Dockerfile to the console. Default value is \code{FALSE}.}
+
+\item{optimize_pak}{A boolean indicating whether or not to try to optimize
+package installations with pak. Defaults to \code{TRUE}. This should rarely be
+changed from its default value. However, sometimes this optimization may
+cause build failures. When encountering a build error, a good first step
+can be to set \code{optimize_pak = FALSE} and see if the error persists.}
 }
 \value{
 The Dockerfile contained as a string vector. Each vector element

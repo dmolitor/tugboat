@@ -3,6 +3,12 @@
 - Adds preliminary Binder support. See the new `binderize()` function and
 its corresponding documentation.
 
+- Adds a new argument `optimize_pak = TRUE` to the `create()` function.
+This argument should almost never need to be set to FALSE, but in some cases
+our method of optimizing package installation with pak can fail, in which
+case setting `optimize_pak = FALSE` reverts to the older, more fail-proof
+method and can alleviate those issues.
+
 # tugboat 0.1.3
 
 - Added better support for binaries via `pak`. Still some limitations when

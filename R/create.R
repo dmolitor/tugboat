@@ -24,12 +24,13 @@
 #'   all files in the directory will be included. NOTE: the file and directory
 #'   paths should be relative to the project directory. They do NOT need to
 #'   be absolute paths.
-#' @param optimize_pak A boolean indicating whether or not to try to optimize
-#'   package installations with pak. Defaults to `TRUE`. This may, in rare cases
-#'   cause issues when building the Docker image. When encountering build issues,
-#'   re-create the Dockerfile with `optimize_pak = FALSE` to potentially resolve.
 #' @param verbose A boolean indicating whether or not to print the resulting
 #'   Dockerfile to the console. Default value is `FALSE`.
+#' @param optimize_pak A boolean indicating whether or not to try to optimize
+#'   package installations with pak. Defaults to `TRUE`. This should rarely be
+#'   changed from its default value. However, sometimes this optimization may
+#'   cause build failures. When encountering a build error, a good first step
+#'   can be to set `optimize_pak = FALSE` and see if the error persists.
 #' 
 #' @seealso [here::here]; this will be used by default to determine the current
 #'   project directory.
@@ -56,8 +57,8 @@ create <- function(
   FROM = NULL,
   ...,
   exclude = NULL,
-  optimize_pak = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  optimize_pak = TRUE
 ) {
   lockfile <- init_renv(project = project, ...)
   dock <- dockerfile(lockfile, FROM = FROM, optimize_pak = optimize_pak)

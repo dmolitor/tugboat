@@ -7,12 +7,13 @@
 <!-- badges: end -->
 
 A simple R package to generate a Dockerfile and corresponding Docker image
-from an analysis directory. tugboat uses the [renv](https://github.com/rstudio/renv/) package to automatically
+from an analysis directory. tugboat also prepares your analysis directory to be
+shared via [Binder](https://mybinder.readthedocs.io/en/latest/index.html).
+
+tugboat uses the [renv](https://github.com/rstudio/renv/) package to automatically
 detect all the packages necessary to replicate your analysis and will generate
 a Dockerfile that contains an exact copy of your entire directory with all
-the packages installed.
-
-tugboat transforms an unstructured analysis folder into a renv.lock file
+the packages installed. tugboat transforms an unstructured analysis folder into a renv.lock file
 and constructs a Docker image that includes all your essential R packages
 based on this lockfile.
 
@@ -36,8 +37,10 @@ pak::pkg_install("dmolitor/tugboat")
 
 ## Usage
 
-tugboat only has two exported functions; one to create a Dockerfile from your
-analysis directory, and one to build the corresponding Docker image.
+tugboat only has three exported functions; one to create a Dockerfile from your
+analysis directory, one to build the corresponding Docker image, and one to make
+your project ready to share and run in an online, interactive compute environment
+via [Binder](https://mybinder.readthedocs.io/en/latest/index.html).
 
 ### Create the Dockerfile
 
@@ -137,6 +140,58 @@ Note: If you choose to push, you also need to provide your DockerHub
 username and password. Typically you don't want to pass these in
 directly and should instead use environment variables (or a similar
 method) instead.
+
+### Share your project via Binder
+
+Binder lets others instantly launch and interact with your R project in a
+live, cloud-based environment with no local setup required. tugboat will
+prepare your project to be shared with Binder. The process is simple:
+
+- First, create the Dockerfile from your analysis directory:
+
+    ``` r
+    create(
+      project = here::here(),
+      exclude = c("data/big_directory_1", "data/big_directory_2")
+    )
+    ```
+
+- Then, prep your directory for Binder. Your analysis directory _must_ be
+a GitHub repository:
+
+    ``` r
+    binderize(branch = "main")
+    ```
+By default this will add a Binder badge to your README.Rmd or README.md file.
+If your README file already has a section for badges, it will add the
+new badge automatically:
+
+    ``` r
+    ✔ Adding "Launch RStudio Binder badge" to README.md.
+    ```
+If your README file does _not_ have a section for badges, it will automatically
+save the badge to your clipboard and you will need to manually insert it
+into the README.
+
+    ``` r
+    ☐ Copy and paste the following lines into README.md:
+      <!-- badges: start -->
+      [![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio)
+      <!-- badges: end -->
+      [Copied to clipboard]
+    ```
+
+After running `binderize()` you will see the following message:
+```
+Your repository has been configured for Binder.
+[x] Commit and push all changes
+[x] Launch Binder at: https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio
+```
+
+You must commit and push all changes _before_ visiting the Binder link,
+otherwise it will likely fail. Binder can automatically detect changes 
+to the repository and will rebuild as necessary, ensuring that the Binder
+repository stays up to date.
 
 ## Why tugboat? 🚢
 

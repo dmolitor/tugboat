@@ -46,6 +46,19 @@ init_renv <- function(
   return(lockfile)
 }
 
+stop_if_docker_not_installed <- function() {
+  is_installed <- Sys.which("docker") != ""
+  if (!is_installed) {
+    stop(
+      c(
+        "Docker is not installed. ",
+        "Visit https://docs.docker.com/get-docker/ to get started!"
+      ),
+      call. = parent.frame()
+    )
+  }
+}
+
 # Write the .dockerignore in the project directory
 write_dockerignore <- function(exclude, project) {
   if (is.null(exclude)) return(TRUE)

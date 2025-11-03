@@ -48,19 +48,20 @@ build <- function(
   dh_username = NULL,
   dh_password = NULL
 ) {
+  stop_if_docker_not_installed()
   if (push) {
     if (is.null(dh_username) || is.null(dh_password)) {
       stop("Both `dh_username` and `dh_password` must be provided")
     }
-    system(
+    cat(system(
       sprintf(
         "echo '%s' | docker login -u %s --password-stdin",
         dh_password,
         dh_username
       ),
-      intern = FALSE,
+      intern = TRUE,
       ignore.stderr = FALSE
-    )
+    ))
   }
   if (is.null(dh_username)) {
     repository <- image_name
@@ -80,9 +81,12 @@ build <- function(
     build_context,
     if (push) "--push" else NULL
   )
-  system2(
+  build_status <- system2(
     "docker",
     exec_args
   )
+  if (build_status != 0) {
+    stop("Build failed with the following status: ", build_status)
+  }
   return(paste0(repository, ":", tag))
 }

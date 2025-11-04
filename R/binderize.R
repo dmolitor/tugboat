@@ -33,6 +33,11 @@ prep_binder_dockerfile <- function(dockerfile, root) {
   if (length(from_idx) == 0) {
     stop("No FROM statement found in Dockerfile. Was it created with tugboat?")
   }
+  # Remove any existing "COPY . <path>" lines from the original tugboat Dockerfile
+  copy_idx <- grep("^COPY\\s+\\.\\s+\\S+", df)
+  if (length(copy_idx) > 0) {
+    df <- df[-copy_idx]
+  }
   # Hard-code the max R major version to 4 until rocker supports > 4
   r_major <- as.character(min(as.integer(R.Version()$major), 4))
   df[[from_idx[[1]]]] <- paste0("FROM rocker/binder:", r_major)

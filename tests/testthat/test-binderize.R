@@ -23,6 +23,12 @@ test_that("Binderizing project works as expected", {
     binderize(here::here("examples/simple/Dockerfile"), add_readme_badge = FALSE), 
     regexp = "Your repository has been configured for Binder"
   )
+
+  # Ensure that the Binder Dockerfile copies files ONLY ONCE
+  df <- readLines(here::here(".binder/Dockerfile"))
+  COPY_lines <- grep("^COPY\\s+\\.\\s+\\S+", df)
+  expect_true(length(COPY_lines) == 0)
+
   if (dir.exists(here::here(".binder"))) {
     file.remove(here::here(".binder/Dockerfile"))
     file.remove(here::here(".binder/"))

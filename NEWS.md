@@ -1,3 +1,8 @@
+# tugboat 0.1.5
+
+- Resolves [#16](https://github.com/dmolitor/tugboat/issues/16). This provides
+slightly more efficient Binder builds and handles build errors more cleanly.
+
 # tugboat 0.1.4
 
 - Adds preliminary Binder support. See the new `binderize()` function and

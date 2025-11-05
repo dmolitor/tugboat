@@ -32,7 +32,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.5" id="tugboat-015">tugboat 0.1.5<a class="anchor" aria-label="anchor" href="#tugboat-015"></a></h2>
-<ul><li>Resolves <a href="https://github.com/dmolitor/tugboat/issues/16" class="external-link">#16</a>. This provides slightly more efficient Binder builds and handles build errors more cleanly.</li>
+<ul><li><p>Resolves <a href="https://github.com/dmolitor/tugboat/issues/17" class="external-link">#17</a>. This was a Windows-specific issue where RStudio would lock down the .Rproj file, causing <code>docker buildx build</code> to fail.</p></li>
+<li><p>Adds a <code>verbose</code> argument to <code><a href="../reference/build.html">build()</a></code>. This will print the full build call that is being executed. This can potentially be helpful when debugging build errors.</p></li>
+<li><p>Resolves <a href="https://github.com/dmolitor/tugboat/issues/16" class="external-link">#16</a>. This provides slightly more efficient Binder builds and handles build errors more cleanly.</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.4" id="tugboat-014">tugboat 0.1.4<a class="anchor" aria-label="anchor" href="#tugboat-014"></a></h2><p class="text-muted">CRAN release: 2025-10-31</p>

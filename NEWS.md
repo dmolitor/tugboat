@@ -1,5 +1,13 @@
 # tugboat 0.1.5
 
+- Resolves [#17](https://github.com/dmolitor/tugboat/issues/17). This was a
+Windows-specific issue where RStudio would lock down the .Rproj file, causing
+`docker buildx build` to fail.
+
+- Adds a `verbose` argument to `build()`. This will print the full build call
+that is being executed. This can potentially be helpful when debugging build
+errors.
+
 - Resolves [#16](https://github.com/dmolitor/tugboat/issues/16). This provides
 slightly more efficient Binder builds and handles build errors more cleanly.
 

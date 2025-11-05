@@ -13,7 +13,8 @@ build(
   build_context = here::here(),
   push = FALSE,
   dh_username = NULL,
-  dh_password = NULL
+  dh_password = NULL,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -42,6 +43,9 @@ necessary if \code{push == TRUE}.}
 
 \item{dh_password}{A string specifying the DockerHub password. Only
 necessary if \code{push == TRUE}.}
+
+\item{verbose}{A boolean. Whether to print the actual Docker build
+command or not. Defaults to \code{FALSE}.}
 }
 \value{
 The name of the built Docker image as a string.

@@ -1,3 +1,67 @@
+is_windows_rstudio <- function() {
+  is_rstudio <- Sys.getenv("RSTUDIO") == "1"
+  is_windows <- .Platform$OS.type == "windows"
+  return(is_rstudio && is_windows)
+}
+
+build_image <- function(
+    dockerfile,
+    platforms,
+    repository,
+    tag,
+    build_args,
+    build_context,
+    push,
+    verbose
+) {
+  if (is_windows_rstudio()) {
+    tmp <- tempfile()
+    dir.create(tmp)
+    on.exit({
+      if (dir.exists(tmp)) unlink(tmp, recursive = TRUE, force = TRUE)
+    }, add = TRUE)
+    # Copy the build context over to a temp directory; our new build context!
+    got_copied <- file.copy(
+      list.files(
+        build_context,
+        full.names = TRUE,
+        all.files = TRUE,
+        no.. = TRUE
+      ),
+      tmp,
+      recursive = TRUE
+    )
+    stopifnot(all(got_copied))
+    # The temp directory is the new build context!
+    build_context <- tmp
+  }
+  exec_args <- c(
+    "buildx",
+    "build",
+    "-f",
+    normalizePath(dockerfile, mustWork = FALSE),
+    "--platform",
+    paste0(platforms, collapse = ","),
+    "-t",
+    paste0(repository, ":", tag),
+    build_args,
+    build_context,
+    if (push) "--push" else NULL
+  )
+  if (verbose) {
+    msg <- paste0("Building:\n", paste0(c("docker", exec_args), collapse = " "))
+    cat(msg, "\n")
+  }
+  build_status <- system2(
+    "docker",
+    exec_args
+  )
+  if (build_status != 0) {
+    stop("Build failed with the following status: ", build_status)
+  }
+  return(TRUE)
+}
+
 #' Build a Docker image
 #'
 #' A simple utility to quickly build a Docker image from a Dockerfile.
@@ -19,6 +83,8 @@
 #'   necessary if `push == TRUE`.
 #' @param dh_password A string specifying the DockerHub password. Only
 #'   necessary if `push == TRUE`.
+#' @param verbose A boolean. Whether to print the actual Docker build
+#'   command or not. Defaults to `FALSE`.
 #' @returns The name of the built Docker image as a string.
 #' @examples
 #' \dontrun{
@@ -46,7 +112,8 @@ build <- function(
   build_context = here::here(),
   push = FALSE,
   dh_username = NULL,
-  dh_password = NULL
+  dh_password = NULL,
+  verbose = FALSE
 ) {
   stop_if_docker_not_installed()
   if (push) {
@@ -68,25 +135,15 @@ build <- function(
   } else {
     repository <- paste0(dh_username, "/", image_name)
   }
-  exec_args <- c(
-    "buildx",
-    "build",
-    "-f",
-    dockerfile,
-    "--platform",
-    paste0(platforms, collapse = ","),
-    "-t",
-    paste0(repository, ":", tag),
-    build_args,
-    build_context,
-    if (push) "--push" else NULL
+  build_image(
+    dockerfile = dockerfile,
+    platforms = platforms,
+    repository = repository,
+    tag = tag,
+    build_args = build_args,
+    build_context = build_context,
+    push = push,
+    verbose = verbose
   )
-  build_status <- system2(
-    "docker",
-    exec_args
-  )
-  if (build_status != 0) {
-    stop("Build failed with the following status: ", build_status)
-  }
   return(paste0(repository, ":", tag))
 }

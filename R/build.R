@@ -1,7 +1,6 @@
-is_windows_rstudio <- function() {
-  is_rstudio <- Sys.getenv("RSTUDIO") == "1"
+is_windows <- function() {
   is_windows <- .Platform$OS.type == "windows"
-  return(is_rstudio && is_windows)
+  return(is_windows)
 }
 
 build_image <- function(
@@ -14,7 +13,7 @@ build_image <- function(
     push,
     verbose
 ) {
-  if (is_windows_rstudio()) {
+  if (is_windows()) {
     tmp <- tempfile()
     dir.create(tmp)
     on.exit({

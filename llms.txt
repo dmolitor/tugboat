@@ -1,0 +1,256 @@
+# tugboat
+
+A simple R package to generate a Dockerfile and corresponding Docker
+image from an analysis directory. tugboat also prepares your analysis
+directory to be shared via
+[Binder](https://mybinder.readthedocs.io/en/latest/index.html).
+
+tugboat uses the [renv](https://github.com/rstudio/renv/) package to
+automatically detect all the packages necessary to replicate your
+analysis and will generate a Dockerfile that contains an exact copy of
+your entire directory with all the packages installed. tugboat
+transforms an unstructured analysis folder into a renv.lock file and
+constructs a Docker image that includes all your essential R packages
+based on this lockfile.
+
+tugboat may be of use, for example, when preparing a replication package
+for research. With tugboat, you can take a directory on your local
+computer and quickly generate a corresponding Dockerfile and Docker
+image that contains all the code and the necessary software to reproduce
+your findings.
+
+## Installation
+
+Install tugboat from CRAN:
+
+``` r
+install.packages("tugboat")
+```
+
+Or install the development version from GitHub:
+
+``` r
+# install.packages("pak")
+pak::pkg_install("dmolitor/tugboat")
+```
+
+## Usage
+
+tugboat only has three exported functions; one to create a Dockerfile
+from your analysis directory, one to build the corresponding Docker
+image, and one to make your project ready to share and run in an online,
+interactive compute environment via
+[Binder](https://mybinder.readthedocs.io/en/latest/index.html).
+
+### Create the Dockerfile
+
+The primary function from tugboat is
+[`create()`](https://dmolitor.com/tugboat/reference/create.md). This
+function converts your analysis directory into a Dockerfile that
+includes all your code and essential R packages.
+
+This function scans all files in the current analysis directory,
+attempts to detect all R packages, and installs these packages in the
+resulting Docker image. It also copies the entire contents of the
+analysis directory into the Docker image. For example, if your analysis
+directory is named `incredible_analysis`, the corresponding location of
+your code and data files in the generated Docker image will be
+`/incredible_analysis`.
+
+For the most common use-cases, there are a couple of arguments in this
+function that are particularly important:
+
+- `project`: This argument tells tugboat which directory is the one to
+  generate the Dockerfile from. You can set this value yourself, or you
+  can just use the default value. By default, tugboat uses the
+  [`here::here`](https://here.r-lib.org/reference/here.html) function to
+  determine what directory is the analysis directory. To get a detailed
+  understanding of exactly how this works take a look at the [here
+  package](https://github.com/r-lib/here/). In general, this “just
+  works”!
+- `as`: This argument tells tugboat where to save the Dockerfile. In
+  general you don’t need to set this and tugboat will just save the
+  Dockerfile in the `project` directory from above.
+- `exclude`: A vector of files or sub-directories in your analysis
+  directory that should ***NOT*** be included in the Docker image. This
+  is particularly important when you have, for example, a sub-directory
+  with large data files that would make the resulting Docker image
+  extremely large if included. You can tell tugboat to exclude this
+  sub-directory and then simply mount it to a Docker container as
+  needed.
+
+Below I’ll outline a couple examples.
+
+``` r
+library(tugboat)
+
+# The simplest scenario where your analysis directory is your current
+# active project, you are fine with the default base "r-base:latest"
+# Docker image, and you want to include all files/directories:
+create()
+
+# Suppose your analysis directory is actually a sub-directory of your
+# main project directory:
+create(project = here::here("sub-directory"))
+
+# Suppose that you specifically need a Docker base image that has RStudio
+# installed so that you can interact with your analysis within a Docker 
+# container. To do this, we will explicitly specify a different Docker
+# base image using the `FROM` argument.
+create(FROM = "rocker/rstudio")
+
+# Finally, suppose that we want to include all files except a couple
+# particularly data-heavy sub-directories:
+create(exclude = c("data/big_directory_1", "data/big_directory_2"))
+```
+
+### Build the Docker image
+
+Once the Dockerfile has been created, we can build the Docker image with
+the [`build()`](https://dmolitor.com/tugboat/reference/build.md)
+function. By default this will infer the Dockerfile directory using
+[`here::here`](https://here.r-lib.org/reference/here.html). This
+function assumes a little knowledge about Docker; if you aren’t sure
+where to start, [this is a great starting
+point](https://colinfay.me/docker-r-reproducibility/).
+
+The following example will do the simplest thing and will build the
+image locally.
+
+``` r
+build(image_name = "awesome_analysis")
+```
+
+Suppose that, like above, your analysis directory is a sub-directory of
+your main project directory:
+
+``` r
+build(
+  dockerfile = here::here("sub-directory"),
+  image_name = "awesome_analysis"
+)
+```
+
+### Push to DockerHub
+
+If, instead of just building the Docker image locally, you want to build
+the image and then push to DockerHub, you can make a couple small
+additions to the code above:
+
+``` r
+build(
+  image_name = "awesome_analysis",
+  push = TRUE,
+  dh_username = Sys.getenv("DH_USERNAME"),
+  dh_password = Sys.getenv("DH_PASSWORD")
+)
+```
+
+Note: If you choose to push, you also need to provide your DockerHub
+username and password. Typically you don’t want to pass these in
+directly and should instead use environment variables (or a similar
+method) instead.
+
+### Share your project via Binder
+
+Binder lets others instantly launch and interact with your R project in
+a live, cloud-based environment with no local setup required. tugboat
+will prepare your project to be shared with Binder. The process is
+simple:
+
+- First, create the Dockerfile from your analysis directory:
+
+  ``` r
+  create(
+    project = here::here(),
+    exclude = c("data/big_directory_1", "data/big_directory_2")
+  )
+  ```
+
+- Then, prep your directory for Binder. Your analysis directory *must*
+  be a GitHub repository:
+
+  ``` r
+  binderize(branch = "main")
+  ```
+
+  By default this will add a Binder badge to your README.Rmd or
+  README.md file. If your README file already has a section for badges,
+  it will add the new badge automatically:
+
+  ``` r
+  ✔ Adding "Launch RStudio Binder badge" to README.md.
+  ```
+
+  If your README file does *not* have a section for badges, it will
+  automatically save the badge to your clipboard and you will need to
+  manually insert it into the README.
+
+  ``` r
+  ☐ Copy and paste the following lines into README.md:
+    <!-- badges: start -->
+    [![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio)
+    <!-- badges: end -->
+    [Copied to clipboard]
+  ```
+
+After running
+[`binderize()`](https://dmolitor.com/tugboat/reference/binderize.md) you
+will see the following message:
+
+    Your repository has been configured for Binder.
+    [x] Commit and push all changes
+    [x] Launch Binder at: https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio
+
+You must commit and push all changes *before* visiting the Binder link,
+otherwise it will likely fail. Binder can automatically detect changes
+to the repository and will rebuild as necessary, ensuring that the
+Binder repository stays up to date.
+
+## Why tugboat? 🚢
+
+There are a few available packages with similar goals, so why tugboat?
+tugboat is minimal and builds directly on top of
+[`renv`](https://rstudio.github.io/renv/articles/renv.html) and
+[`pak`](https://pak.r-lib.org/). Each of these packages is actively
+maintained and provides specific utilities that the tugboat utilizes for
+maximum convenience. tugboat aims to leverage packages that are likely
+to remain actively maintained and handle dependency management as
+seamlessly as possible.
+
+- [containerit](https://o2r.info/containerit/) is a robust package that
+  is directly comparable to tugboat. However, it implements its own
+  method for discovering R package dependencies instead of using renv.
+  It also relies on [sysreqsdb](https://github.com/r-hub/sysreqsdb) for
+  system dependency discovery, which has been archived in favor of
+  [r-system-requirements](https://github.com/rstudio/r-system-requirements),
+  which pak is built on. It also isn’t super actively maintained and
+  isn’t on CRAN.
+
+- [holepunch](https://github.com/karthik/holepunch) is related but
+  focuses on making GitHub repositories Binder-compatible. It currently
+  relies on MRAN, which is now obsolete, and does not use pak for system
+  dependency management. It is also not actively maintained and is not
+  on CRAN.
+
+- [automagic](https://github.com/cole-brokamp/automagic) focuses on
+  automatically detecting and installing R package dependencies but uses
+  its own method rather than relying on renv. automagic also has no
+  utilities for creating/building Docker images.
+
+## Examples
+
+For some worked examples of how to use tugboat in practice, see the
+`examples/` directory.
+
+# Package index
+
+## All functions
+
+- [`binderize()`](https://dmolitor.com/tugboat/reference/binderize.md) :
+  Prepare project for Binder
+- [`build()`](https://dmolitor.com/tugboat/reference/build.md) : Build a
+  Docker image
+- [`create()`](https://dmolitor.com/tugboat/reference/create.md) :
+  Create a Dockerfile
+

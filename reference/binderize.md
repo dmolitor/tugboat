@@ -14,7 +14,8 @@ binderize(
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",
-  add_readme_badge = TRUE
+  add_readme_badge = TRUE,
+  overwrite = TRUE
 )
 ```
 
@@ -42,6 +43,11 @@ binderize(
 
   Logical. Whether to add a Binder launch badge to the README. Defaults
   to `TRUE`.
+
+- overwrite:
+
+  Logical. Whether to overwrite an existing Binder Dockerfile. Defaults
+  to TRUE.
 
 ## Value
 

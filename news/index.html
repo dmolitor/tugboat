@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tugboat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,6 +30,10 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.6" id="tugboat-016">tugboat 0.1.6<a class="anchor" aria-label="anchor" href="#tugboat-016"></a></h2>
+<ul><li>Resolves <a href="https://github.com/dmolitor/tugboat/issues/18" class="external-link">#18</a>. Previously, when calling <code><a href="../reference/binderize.html">binderize()</a></code>, tugboat would never overwrite an existing Dockerfile at <code>.binder/Dockerfile</code> if it already existed. This is bad if the user has updated the tugboat Dockerfile and wants to update the Binder Dockerfile correspondingly. Now, tugboat will default to overwriting the existing Binder Dockerfile, ensuring that any changes in the tugboat Dockerfile will propagate to Binder. The user can explicitly control this behavior via the <code>overwrite</code> argument of <code>binderize</code>.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.5" id="tugboat-015">tugboat 0.1.5<a class="anchor" aria-label="anchor" href="#tugboat-015"></a></h2><p class="text-muted">CRAN release: 2025-11-10</p>
 <ul><li><p>Resolves <a href="https://github.com/dmolitor/tugboat/issues/17" class="external-link">#17</a>. This was a Windows-specific issue where RStudio would lock down the .Rproj file, causing <code>docker buildx build</code> to fail.</p></li>

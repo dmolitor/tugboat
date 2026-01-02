@@ -13,7 +13,7 @@ Optionally, it can add a Binder launch badge to the project's README."><meta pro
 
     <a class="navbar-brand me-2" href="../index.html">tugboat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,8 @@ Optionally, it can add a Binder launch badge to the project's README.</p>
 <span>  branch <span class="op">=</span> <span class="st">"main"</span>,</span>
 <span>  hub <span class="op">=</span> <span class="st">"mybinder.org"</span>,</span>
 <span>  urlpath <span class="op">=</span> <span class="st">"rstudio"</span>,</span>
-<span>  add_readme_badge <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  add_readme_badge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,6 +81,10 @@ Defaults to <code>"rstudio"</code>, which opens an RStudio Server session.</p></
 <dt id="arg-add-readme-badge">add_readme_badge<a class="anchor" aria-label="anchor" href="#arg-add-readme-badge"></a></dt>
 <dd><p>Logical. Whether to add a Binder launch badge to the README.
 Defaults to <code>TRUE</code>.</p></dd>
+
+
+<dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
+<dd><p>Logical. Whether to overwrite an existing Binder Dockerfile. Defaults to TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">

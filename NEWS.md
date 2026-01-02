@@ -1,3 +1,13 @@
+# tugboat 0.1.6
+
+- Resolves [#18](https://github.com/dmolitor/tugboat/issues/18). Previously,
+when calling `binderize()`, tugboat would never overwrite an existing Dockerfile
+at `.binder/Dockerfile` if it already existed. This is bad if the user has updated
+the tugboat Dockerfile and wants to update the Binder Dockerfile correspondingly.
+Now, tugboat will default to overwriting the existing Binder Dockerfile, ensuring
+that any changes in the tugboat Dockerfile will propagate to Binder. The user can
+explicitly control this behavior via the `overwrite` argument of `binderize`.
+
 # tugboat 0.1.5
 
 - Resolves [#17](https://github.com/dmolitor/tugboat/issues/17). This was a

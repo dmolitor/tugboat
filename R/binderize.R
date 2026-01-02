@@ -24,10 +24,10 @@ path_first_existing <- function(paths) {
   return(paths[which(path_exists)[[1]]])
 }
 
-prep_binder_dockerfile <- function(dockerfile, root) {
+prep_binder_dockerfile <- function(dockerfile, root, overwrite = TRUE) {
   binder_df_dir <- file.path(root, ".binder")
   target_path <- file.path(binder_df_dir, "Dockerfile")
-  if (file.exists(target_path)) return(invisible(NULL))
+  if (file.exists(target_path) && !overwrite) return(invisible(NULL))
   df <- readLines(dockerfile)
   from_idx <- grep("^FROM\\s+", df)
   if (length(from_idx) == 0) {
@@ -71,6 +71,7 @@ prep_binder_dockerfile <- function(dockerfile, root) {
 #'   Defaults to `"rstudio"`, which opens an RStudio Server session.
 #' @param add_readme_badge Logical. Whether to add a Binder launch badge to the README.
 #'   Defaults to `TRUE`.
+#' @param overwrite Logical. Whether to overwrite an existing Binder Dockerfile. Defaults to TRUE.
 #'
 #' @return Invisibly returns `NULL`. Called primarily for its side effects of creating
 #'   Binder-related files and optionally committing them.
@@ -99,7 +100,8 @@ binderize <- function(
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",
-  add_readme_badge = TRUE
+  add_readme_badge = TRUE,
+  overwrite = TRUE
 ) {
   hub <- match.arg(hub, c("mybinder.org")) # Add more hubs if interested later
   check_if_installed("gert")
@@ -124,7 +126,7 @@ binderize <- function(
   }
   badge_url <- sprintf("https://%s/badge_logo.svg", hub)
 
-  prep_binder_dockerfile(dockerfile, local_repo)
+  prep_binder_dockerfile(dockerfile, root = local_repo, overwrite = overwrite)
   if (add_readme_badge) {
     check_if_installed("usethis")
     usethis::use_badge("Launch RStudio Binder", binder_url, badge_url)

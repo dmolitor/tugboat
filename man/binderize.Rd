@@ -9,7 +9,8 @@ binderize(
   branch = "main",
   hub = "mybinder.org",
   urlpath = "rstudio",
-  add_readme_badge = TRUE
+  add_readme_badge = TRUE,
+  overwrite = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ Defaults to \code{"rstudio"}, which opens an RStudio Server session.}
 
 \item{add_readme_badge}{Logical. Whether to add a Binder launch badge to the README.
 Defaults to \code{TRUE}.}
+
+\item{overwrite}{Logical. Whether to overwrite an existing Binder Dockerfile. Defaults to TRUE.}
 }
 \value{
 Invisibly returns \code{NULL}. Called primarily for its side effects of creating

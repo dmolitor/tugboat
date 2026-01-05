@@ -200,7 +200,7 @@ tugboat is minimal and builds directly on top of
 [`renv`](https://rstudio.github.io/renv/articles/renv.html) and
 [`pak`](https://pak.r-lib.org/).
 Each of these packages is actively maintained and provides specific
-utilities that the tugboat utilizes for maximum convenience.
+utilities that tugboat utilizes for maximum convenience.
 tugboat aims to leverage packages that are likely to remain actively
 maintained and handle dependency management as seamlessly as possible.
 

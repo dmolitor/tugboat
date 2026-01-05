@@ -7,7 +7,7 @@
 <!-- badges: end -->
 
 A simple R package to generate a Dockerfile and corresponding Docker image
-from an analysis directory. tugboat also prepares your analysis directory to be
+from an analysis directory. tugboat also prepares your analysis repository to be
 shared via [Binder](https://mybinder.readthedocs.io/en/latest/index.html).
 
 tugboat uses the [renv](https://github.com/rstudio/renv/) package to automatically
@@ -166,20 +166,20 @@ By default this will add a Binder badge to your README.Rmd or README.md file.
 If your README file already has a section for badges, it will add the
 new badge automatically:
 
-    ``` r
-    ✔ Adding "Launch RStudio Binder badge" to README.md.
-    ```
+``` r
+✔ Adding "Launch RStudio Binder badge" to README.md.
+```
 If your README file does _not_ have a section for badges, it will automatically
 save the badge to your clipboard and you will need to manually insert it
 into the README.
 
-    ``` r
-    ☐ Copy and paste the following lines into README.md:
-      <!-- badges: start -->
-      [![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio)
-      <!-- badges: end -->
-      [Copied to clipboard]
-    ```
+``` r
+☐ Copy and paste the following lines into README.md:
+  <!-- badges: start -->
+  [![Launch RStudio Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{username}/{repo}/{branch}?urlpath=rstudio)
+  <!-- badges: end -->
+  [Copied to clipboard]
+```
 
 After running `binderize()` you will see the following message:
 ```

@@ -2,6 +2,8 @@
 
 ## tugboat 0.1.6
 
+CRAN release: 2026-01-20
+
 - Resolves [\#18](https://github.com/dmolitor/tugboat/issues/18).
   Previously, when calling
   [`binderize()`](https://dmolitor.com/tugboat/reference/binderize.md),

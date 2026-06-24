@@ -24,12 +24,14 @@ your findings.
 Install tugboat from CRAN:
 
 ``` r
+
 install.packages("tugboat")
 ```
 
 Or install the development version from GitHub:
 
 ``` r
+
 # install.packages("pak")
 pak::pkg_install("dmolitor/tugboat")
 ```
@@ -82,6 +84,7 @@ function that are particularly important:
 Below I’ll outline a couple examples.
 
 ``` r
+
 library(tugboat)
 
 # The simplest scenario where your analysis directory is your current
@@ -118,6 +121,7 @@ The following example will do the simplest thing and will build the
 image locally.
 
 ``` r
+
 build(image_name = "awesome_analysis")
 ```
 
@@ -125,6 +129,7 @@ Suppose that, like above, your analysis directory is a sub-directory of
 your main project directory:
 
 ``` r
+
 build(
   dockerfile = here::here("sub-directory"),
   image_name = "awesome_analysis"
@@ -138,6 +143,7 @@ the image and then push to DockerHub, you can make a couple small
 additions to the code above:
 
 ``` r
+
 build(
   image_name = "awesome_analysis",
   push = TRUE,
@@ -161,6 +167,7 @@ simple:
 - First, create the Dockerfile from your analysis directory:
 
   ``` r
+
   create(
     project = here::here(),
     exclude = c("data/big_directory_1", "data/big_directory_2")
@@ -171,6 +178,7 @@ simple:
   be a GitHub repository:
 
   ``` r
+
   binderize(branch = "main")
   ```
 
@@ -242,6 +250,11 @@ seamlessly as possible.
 
 For some worked examples of how to use tugboat in practice, see the
 `examples/` directory.
+
+## Python package
+
+This package has a sibling [Python
+package](https://github.com/dmolitor/tugboat-py)!
 
 # Package index
 

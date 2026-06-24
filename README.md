@@ -228,3 +228,7 @@ creating/building Docker images.
 
 For some worked examples of how to use tugboat in practice, see the
 `examples/` directory.
+
+## Python package
+
+This package has a sibling [Python package](https://github.com/dmolitor/tugboat-py)!
